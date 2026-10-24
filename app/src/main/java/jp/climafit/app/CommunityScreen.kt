@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -20,7 +21,7 @@ internal fun CommunityScreen(model: ClimaFitViewModel) {
     var showForm by rememberSaveable { mutableStateOf(false) }
     var location by rememberSaveable { mutableStateOf(model.roomName) }
     var feel by rememberSaveable { mutableStateOf("快適") }
-    var comment by rememberSaveable { mutableStateOf("") }
+    var comment by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -55,10 +56,11 @@ internal fun CommunityScreen(model: ClimaFitViewModel) {
                 Text("どこで、どんなふうに感じた？", color = Muted)
                 Selector("場所", location, model.rooms.map { it.name }) { location = it }
                 Selector("体感", feel, listOf("快適", "少し寒い", "かなり寒い", "少し暑い")) { feel = it }
-                OutlinedTextField(comment, { if (it.length <= 500) comment = it }, label = { Text("ひとこと") },
-                    placeholder = { Text("窓際は少しひんやり、など") }, supportingText = { Text("${comment.length} / 500文字") },
+                OutlinedTextField(comment, { comment = it }, label = { Text("ひとこと") },
+                    placeholder = { Text("窓際は少しひんやり、など") }, supportingText = { Text("${comment.text.length} / 500文字") },
+                    keyboardOptions = JapaneseKeyboardOptions, isError = comment.text.length > 500,
                     modifier = Modifier.fillMaxWidth(), minLines = 3, shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
-                Button(enabled = comment.isNotBlank(), onClick = {
+                Button(enabled = comment.text.isNotBlank() && comment.text.length <= 500, onClick = {
                     showForm = false; model.message("投稿画面のプレビューです。内容は送信・保存されません。")
                 }, modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(14.dp)) { Text("投稿する", fontWeight = FontWeight.Bold) }
                 Text("UIプレビューのため、投稿は送信されません。", style = MaterialTheme.typography.bodySmall, color = Muted)

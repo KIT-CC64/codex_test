@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,7 +70,7 @@ private fun AiChoiceCard(title: String, description: String, icon: Int, palette:
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AiConversation(model: ClimaFitViewModel, mode: AiMode, onBack: () -> Unit) {
-    var text by rememberSaveable { mutableStateOf("") }
+    var text by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
     var showPhotoOptions by rememberSaveable { mutableStateOf(false) }
     val list = rememberLazyListState()
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> uri?.let(model::loadPhoto) }
@@ -117,12 +118,14 @@ private fun AiConversation(model: ClimaFitViewModel, mode: AiMode, onBack: () ->
                     IconButton(onClick = { showPhotoOptions = true }, enabled = !model.loadingPhoto) {
                         Icon(painterResource(R.drawable.ic_image), contentDescription = "コーデの写真を添付", tint = Orange)
                     }
-                    OutlinedTextField(value = text, onValueChange = { if (it.length <= 1000) text = it },
-                        modifier = Modifier.weight(1f), placeholder = { Text(if (mode == AiMode.PHOTO) "この服装、どうかな？" else "今日の服装を提案して", style = MaterialTheme.typography.bodySmall) },
-                        shape = RoundedCornerShape(20.dp), maxLines = 4,
-                        colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, unfocusedBorderColor = Outline))
-                    FilledIconButton(onClick = { model.sendPreviewMessage(text, mode); text = "" },
-                        enabled = !model.loadingPhoto && (text.isNotBlank() || model.photo != null), modifier = Modifier.size(48.dp)) {
+                    JapaneseMessageField(
+                        value = text,
+                        onValueChange = { text = it },
+                        modifier = Modifier.weight(1f),
+                        placeholder = if (mode == AiMode.PHOTO) "この服装、どうかな？" else "今日の服装を提案して",
+                    )
+                    FilledIconButton(onClick = { model.sendPreviewMessage(text.text, mode); text = TextFieldValue() },
+                        enabled = !model.loadingPhoto && text.text.length <= 1000 && (text.text.isNotBlank() || model.photo != null), modifier = Modifier.size(48.dp)) {
                         Icon(painterResource(R.drawable.ic_send), contentDescription = "メッセージを送る（画面内プレビューのみ）")
                     }
                 }

@@ -43,7 +43,7 @@ private fun ClimaFitApp(model: ClimaFitViewModel = viewModel()) {
         containerColor = Paper,
         topBar = { TopAppBar(colors = TopAppBarDefaults.topAppBarColors(containerColor = Paper), title = {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Image(painterResource(R.drawable.ic_climafit_brand), contentDescription = null, modifier = Modifier.size(38.dp))
+                Image(painterResource(R.drawable.ic_climafit_mark), contentDescription = null, modifier = Modifier.size(38.dp))
                 Column(Modifier.weight(1f)) {
                     Text("ClimaFit", fontWeight = FontWeight.ExtraBold, letterSpacing = (-0.7).sp)
                     Text("金沢の毎日に、心地よい一着。", style = MaterialTheme.typography.labelSmall, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = Muted)
