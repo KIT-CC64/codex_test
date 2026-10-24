@@ -38,7 +38,6 @@ class LayeRoomViewModel(application: Application) : AndroidViewModel(application
         latestAiRequest = AiRequestUi(AiMode.SUGGEST, prompt = TODAY_OUTFIT_PROMPT, location = roomName,
             indoorTemperature = room.temperature, outdoorTemperature = outdoorTemperature)
     }
-    fun useCameraPreview(bitmap: Bitmap) { clearPhoto(); photo = bitmap }
     private var photoJob: Job? = null
     private var photoVersion = 0
     fun message(text: String) { notice = text }

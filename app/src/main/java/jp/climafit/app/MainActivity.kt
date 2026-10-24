@@ -1,7 +1,6 @@
 package jp.climafit.app
 
 import android.content.ActivityNotFoundException
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -47,7 +46,6 @@ class MainActivity : ComponentActivity() {
 internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
     var tab by rememberSaveable { mutableStateOf(Tab.HOME) }
     var aiMode by rememberSaveable { mutableStateOf<AiMode?>(null) }
-    var showPhotoPicker by rememberSaveable { mutableStateOf(false) }
     var roomPicker by rememberSaveable { mutableStateOf<RoomPicker?>(null) }
     var communityLocation by rememberSaveable { mutableStateOf<String?>(null) }
     val snackbar = remember { SnackbarHostState() }
@@ -61,21 +59,15 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
         tab = Tab.HOME
     }
     fun acceptPhoto(uri: Uri) {
-        showPhotoPicker = false
         model.loadPhoto(uri)
-        aiMode = AiMode.PHOTO
-    }
-    fun acceptCameraPhoto(bitmap: Bitmap) {
-        showPhotoPicker = false
-        model.useCameraPreview(bitmap)
-        model.requestPhotoPreview()
         aiMode = AiMode.PHOTO
     }
     val photoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) acceptPhoto(uri)
     }
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        if (bitmap != null) acceptCameraPhoto(bitmap)
+    fun openPhotoPicker() {
+        try { photoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }
+        catch (_: ActivityNotFoundException) { model.message("写真選択を開けませんでした。端末の写真アプリをご確認ください。") }
     }
     BackHandler(enabled = aiMode != null) { backHome() }
     Scaffold(
@@ -100,7 +92,7 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
                 Tab.entries.forEach { destination ->
                     NavigationBarItem(selected = tab == destination, onClick = {
                         if (aiMode == AiMode.PHOTO) model.clearPhoto()
-                        aiMode = null; showPhotoPicker = false; tab = destination
+                        aiMode = null; tab = destination
                         roomPicker = if (destination == Tab.COMMUNITY) RoomPicker.COMMUNITY else null
                     }, modifier = Modifier.testTag("tab-${destination.name}"),
                         icon = { Icon(painterResource(destination.icon), contentDescription = null,
@@ -116,45 +108,18 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
         Box(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).imePadding()) {
             val selectedAiMode = aiMode
             if (selectedAiMode != null) {
-                AiStatusScreen(model, selectedAiMode, onBack = ::backHome, onRetryPhoto = { showPhotoPicker = true })
+                AiStatusScreen(model, selectedAiMode, onBack = ::backHome, onRetryPhoto = ::openPhotoPicker)
             } else {
                 screens.SaveableStateProvider(tab.name) {
                     when (tab) {
                         Tab.HOME -> HomeScreen(model,
-                            onPhoto = { showPhotoPicker = true },
+                            onPhoto = ::openPhotoPicker,
                             onChooseRoom = { roomPicker = RoomPicker.HOME },
                             onSuggest = { model.requestSuggestionPreview(); aiMode = AiMode.SUGGEST })
                         Tab.OUTFITS -> OutfitsScreen(model)
                         Tab.COMMUNITY -> CommunityScreen(model, communityLocation) { roomPicker = RoomPicker.COMMUNITY }
                     }
                 }
-            }
-        }
-    }
-    if (showPhotoPicker) {
-        ModalBottomSheet(onDismissRequest = { showPhotoPicker = false },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
-            Column(Modifier.fillMaxWidth().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("服の写真を選ぶ", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Text("写真を1枚選ぶと、そのまま診断画面へ進みます。", color = Muted)
-                FilledTonalButton(onClick = {
-                    showPhotoPicker = false
-                    try { photoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }
-                    catch (_: ActivityNotFoundException) { model.message("写真選択を開けませんでした。カメラでの撮影をお試しください。") }
-                }, modifier = Modifier.fillMaxWidth().testTag("launch-photo-picker")) {
-                    Icon(painterResource(R.drawable.ic_image), contentDescription = null)
-                    Spacer(Modifier.width(8.dp)); Text("写真を選ぶ")
-                }
-                OutlinedButton(onClick = {
-                    showPhotoPicker = false
-                    try { cameraLauncher.launch(null) }
-                    catch (_: ActivityNotFoundException) { model.message("カメラを起動できませんでした。写真から選択してください。") }
-                }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(painterResource(R.drawable.ic_camera), contentDescription = null)
-                    Spacer(Modifier.width(8.dp)); Text("カメラで撮る")
-                }
-                Text("プレビューでは写真を送信・保存しません。", style = MaterialTheme.typography.bodySmall, color = Muted)
-                Spacer(Modifier.height(12.dp))
             }
         }
     }

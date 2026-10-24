@@ -90,7 +90,6 @@ class FrontendUiTest {
     private fun launchPhotoSelection() {
         revealHomeAction("home-photo")
         compose.onNodeWithTag("home-photo").performScrollTo().performClick()
-        compose.onNodeWithTag("launch-photo-picker").performClick()
         compose.runOnIdle { assertEquals("Native photo picker must have opened once", 1, pickerLaunches) }
     }
     private fun photoUri(valid: Boolean = true): Uri {
@@ -172,7 +171,7 @@ class FrontendUiTest {
         compose.onNodeWithText("コーデを確認しています").assertExists()
     }
 
-    @Test fun cancellingPhotoPickerKeepsHomeAndDoesNotSubmitRequest() {
+    @Test fun oneTapOpensNativePickerAndCancellationKeepsHomeWithoutSubmitting() {
         val model = showApp(null)
         launchPhotoSelection()
         compose.onNodeWithTag("home-screen").assertExists()
