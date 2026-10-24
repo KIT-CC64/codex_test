@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
@@ -27,25 +26,18 @@ class ClimaFitViewModel(application: Application) : AndroidViewModel(application
     var notice by mutableStateOf<String?>(null); private set
     var photo by mutableStateOf<Bitmap?>(null); private set
     var loadingPhoto by mutableStateOf(false); private set
-    private val photoMessages = mutableStateListOf(
-        ChatMessageUi("photo-intro", "今日のコーデを見せてください。写真を撮るか、写真から選んで、気になることを添えて相談できます。", false),
-    )
-    private val suggestionMessages = mutableStateListOf(
-        ChatMessageUi("suggest-intro", "今日着る服を一緒に考えましょう。行き先や、どんな服装にしたいかを教えてください。気温や室温、過去のコーデを使った提案の画面サンプルです。", false),
-    )
-    fun messagesFor(mode: AiMode): List<ChatMessageUi> = if (mode == AiMode.PHOTO) photoMessages else suggestionMessages
-    private var nextMessage = 1
-    fun sendPreviewMessage(text: String, mode: AiMode) {
-        if ((text.isBlank() && photo == null) || loadingPhoto) return
-        val messages = if (mode == AiMode.PHOTO) photoMessages else suggestionMessages
-        val attachedPhoto = photo
-        messages.add(ChatMessageUi("user-${nextMessage++}", text.trim(), true, photo = attachedPhoto))
-        messages.add(if (mode == AiMode.PHOTO) {
-            ChatMessageUi("assistant-${nextMessage++}", "【診断画面のサンプル応答】写真や文章は送信していません。実際の評価・アドバイスはAI連携後に表示されます。", false, showSave = attachedPhoto != null)
-        } else {
-            ChatMessageUi("assistant-${nextMessage++}", "【提案画面のサンプル応答】カーディガンとシャツを組み合わせた表示例です。実際には、気温や室温、過去のコーデをもとにしたAIの提案をここに表示します。", false, samplePhoto = R.drawable.outfit_warm, showSave = true)
-        })
-        clearPhoto()
+    var latestAiRequest by mutableStateOf<AiRequestUi?>(null); private set
+    var photoResultVisible by mutableStateOf(false); private set
+    var suggestionResultVisible by mutableStateOf(false); private set
+    fun requestPhotoPreview() {
+        val selectedPhoto = photo ?: return
+        if (loadingPhoto) return
+        latestAiRequest = AiRequestUi(AiMode.PHOTO, photo = selectedPhoto)
+        photoResultVisible = true
+    }
+    fun requestSuggestionPreview() {
+        latestAiRequest = AiRequestUi(AiMode.SUGGEST, prompt = TODAY_OUTFIT_PROMPT)
+        suggestionResultVisible = true
     }
     fun useCameraPreview(bitmap: Bitmap) { clearPhoto(); photo = bitmap }
     private var photoJob: Job? = null
@@ -53,7 +45,7 @@ class ClimaFitViewModel(application: Application) : AndroidViewModel(application
     fun message(text: String) { notice = text }
     fun dismissNotice() { notice = null }
     fun selectRoom(name: String) { if (rooms.any { it.name == name }) roomName = name }
-    fun clearPhoto() { photoVersion++; photoJob?.cancel(); photo = null; loadingPhoto = false }
+    fun clearPhoto() { photoVersion++; photoJob?.cancel(); photo = null; loadingPhoto = false; photoResultVisible = false }
     fun loadPhoto(uri: Uri) {
         clearPhoto(); loadingPhoto = true
         val version = photoVersion

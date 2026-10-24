@@ -28,14 +28,13 @@ enum class TemperatureMode(val label: String) {
 enum class AiMode(val title: String) {
     PHOTO("写真でコーデ診断"), SUGGEST("AIからのコーデ提案")
 }
-data class ChatMessageUi(
-    val id: String,
-    val text: String,
-    val fromUser: Boolean,
+/** Frontend action payload only; this does not define a server API or send anything. */
+data class AiRequestUi(
+    val mode: AiMode,
+    val prompt: String? = null,
     val photo: android.graphics.Bitmap? = null,
-    val samplePhoto: Int? = null,
-    val showSave: Boolean = false,
 )
+const val TODAY_OUTFIT_PROMPT = "今日の服装を提案して"
 object PreviewData {
     const val outdoorTemperature = 18.5
     val rooms = listOf(

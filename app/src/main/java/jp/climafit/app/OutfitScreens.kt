@@ -56,7 +56,7 @@ internal fun Dashboard(model: ClimaFitViewModel, onConsult: () -> Unit) {
                         colors = ButtonDefaults.buttonColors(containerColor = palette.foreground),
                         contentPadding = PaddingValues(14.dp)) {
                         Icon(painterResource(R.drawable.ic_chat), contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp)); Text("このコーデをAIに相談する", fontWeight = FontWeight.Bold)
+                        Spacer(Modifier.width(8.dp)); Text("写真診断・AI提案を使う", fontWeight = FontWeight.Bold)
                     }
                 }
             }
