@@ -1,6 +1,6 @@
 package jp.climafit.app
 
-/** Display-only sample data. No sensor access, AI logic, index calculation or storage. */
+/** Display samples only. Evaluation, suggestions, transport and storage belong to the backend. */
 data class RoomUi(
     val name: String,
     val temperature: Double,
@@ -9,6 +9,7 @@ data class RoomUi(
     val recommendationTitle: String,
     val recommendationDescription: String,
     val layers: List<String>,
+    val photo: Int,
 )
 data class OutfitLogUi(
     val id: String,
@@ -18,24 +19,37 @@ data class OutfitLogUi(
     val outdoorTemperature: Double,
     val title: String,
     val comment: String,
+    val photo: Int,
 )
 data class ReviewUi(val id: String, val location: String, val feel: String, val comment: String, val date: String)
-enum class TemperatureMode(val label: String) { ALL("すべて"), CURRENT("現在の室温"), CUSTOM("指定した温度") }
-
+enum class TemperatureMode(val label: String) {
+    ALL("すべて"), OUTDOOR("今の金沢"), CURRENT("今の室温"), CUSTOM("温度を指定")
+}
+data class ChatMessageUi(
+    val id: String,
+    val text: String,
+    val fromUser: Boolean,
+    val photo: android.graphics.Bitmap? = null,
+    val samplePhoto: Int? = null,
+    val showSave: Boolean = false,
+)
 object PreviewData {
     const val outdoorTemperature = 18.5
     val rooms = listOf(
-        RoomUi("情報講義室A", 24.2, 62, "71.9 · 快適", "カーディガンを使った重ね着", "屋外の肌寒さに備えて、着脱しやすい羽織りものを持ちましょう。", listOf("カーディガン / 薄手ジャケット", "長袖シャツ")),
-        RoomUi("図書館 2F", 21.0, 48, "66.4 · 快適", "図書館向けの服装提案", "長袖シャツを基本に、体感に合わせて調節しましょう。", listOf("薄手の羽織りもの", "長袖のトップス")),
-        RoomUi("学生食堂", 26.5, 70, "76.0 · やや暑い", "食堂向けの服装提案", "提案内容は表示確認用の固定サンプルです。", listOf("通気性の良いシャツ")),
-        RoomUi("実験室3", 19.5, 42, "64.2 · 肌寒い", "実験室向けの服装提案", "肌寒さに備えてジャケットを用意しましょう。", listOf("ジャケット", "長袖シャツ")),
+        RoomUi("図書館", 21.0, 48, "66.4 · 快適", "羽織りを一枚、\n心地よく。", "長袖シャツに、軽いカーディガンを。屋外と室内の行き来も、脱ぎ着で調整できます。", listOf("カーディガン", "コットンシャツ", "ストレートパンツ"), R.drawable.outfit_warm),
+        RoomUi("201教室", 24.2, 62, "71.9 · 快適", "軽やかに、\n教室も快適。", "シャツを主役に、羽織りものを一枚。暖かい教室では脱いで、すっきり過ごしましょう。", listOf("薄手のカーディガン", "長袖シャツ", "パンツ"), R.drawable.outfit_warm),
+        RoomUi("学生食堂", 26.5, 70, "76.0 · やや暑い", "さらっと、\n涼しい一着。", "通気性のよいトップスを中心に。移動中に羽織れる一枚があると安心です。", listOf("薄手のトップス", "軽いパンツ"), R.drawable.outfit_warm),
+        RoomUi("実験室3", 19.5, 42, "64.2 · 肌寒い", "冷える部屋には、\nやさしい一枚を。", "長袖にライトジャケットを重ねて。冷気が気になる場所でも調節しやすい組み合わせです。", listOf("ライトジャケット", "白いトップス", "ゆったりパンツ"), R.drawable.outfit_cool),
     )
     val logs = listOf(
-        OutfitLogUi("preview-1", "2026/10/24 12:30", "情報講義室A", 24.2, 18.5, "カーディガンを使った重ね着", "記録一覧の表示サンプルです。"),
-        OutfitLogUi("preview-2", "2026/10/23 10:00", "実験室3", 19.5, 17.0, "長袖とジャケット", "温度条件による表示切り替えを確認できます。"),
+        OutfitLogUi("preview-1", "10月24日", "201教室", 24.2, 18.5, "カーディガンで軽やかに", "生成したサンプル写真", R.drawable.outfit_warm),
+        OutfitLogUi("preview-2", "10月23日", "実験室3", 19.5, 17.0, "肌寒い日のライトジャケット", "生成したサンプル写真", R.drawable.outfit_cool),
     )
     val reviews = listOf(
-        ReviewUi("preview-1", "情報講義室A", "快適", "エアコンの温度設定が丁度良く快適です！", "サンプル"),
-        ReviewUi("preview-2", "実験室3", "かなり寒い", "羽織りものがあると安心です。", "サンプル"),
+        ReviewUi("preview-1", "図書館", "少し寒い", "窓際の席は少しひんやり。薄いカーディガンがあるとちょうどよかったです。", "10分前"),
+        ReviewUi("preview-2", "201教室", "快適", "今日は過ごしやすい室温！長袖シャツ一枚で大丈夫でした。", "25分前"),
+        ReviewUi("preview-3", "学生食堂", "少し暑い", "お昼は人が多くてぽかぽか。上着は脱いで過ごしています。", "40分前"),
+        ReviewUi("preview-4", "実験室3", "かなり寒い", "空調の近くは冷えやすいので、羽織りものがおすすめです。", "1時間前"),
+        ReviewUi("preview-5", "図書館", "快適", "奥の席はちょうどいい感じ。落ち着いて作業できました。", "2時間前"),
     )
 }
