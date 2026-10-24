@@ -24,39 +24,50 @@ internal fun CommunityScreen(model: LayeRoomViewModel, selectedLocation: String?
     var feel by rememberSaveable { mutableStateOf("快適") }
     var comment by rememberSaveable(stateSaver = TextFieldValue.Saver) { mutableStateOf(TextFieldValue()) }
     val reviews = model.reviews.filter { it.location == selectedLocation }
-    LazyColumn(Modifier.fillMaxSize().testTag("community-screen"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("今日のひろば", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
-                Text("教室の「ちょっと寒い」を、シェアしよう。", style = MaterialTheme.typography.bodyMedium, color = Muted)
-                OutlinedButton(onClick = onChooseLocation, modifier = Modifier.fillMaxWidth().testTag("community-location")) {
-                    Icon(painterResource(R.drawable.ic_pin), contentDescription = null)
-                    Spacer(Modifier.width(8.dp)); Text(selectedLocation?.let { "$it · 場所を変更" } ?: "口コミを見る場所を選ぶ")
+    Column(Modifier.fillMaxSize()) {
+        LazyColumn(Modifier.fillMaxWidth().weight(1f).testTag("community-screen"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Text("今日のひろば", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
+                    Text("教室の「ちょっと寒い」を、シェアしよう。", style = MaterialTheme.typography.bodyMedium, color = Muted)
+                    OutlinedButton(onClick = onChooseLocation, modifier = Modifier.fillMaxWidth().testTag("community-location")) {
+                        Icon(painterResource(R.drawable.ic_pin), contentDescription = null)
+                        Spacer(Modifier.width(8.dp)); Text(selectedLocation?.let { "$it · 場所を変更" } ?: "口コミを見る場所を選ぶ")
+                    }
                 }
-                if (selectedLocation != null) {
-                    FilledTonalButton(onClick = { showForm = true }, modifier = Modifier.fillMaxWidth()) {
-                        Icon(painterResource(R.drawable.ic_add), contentDescription = null)
-                        Spacer(Modifier.width(8.dp)); Text("いまの体感を投稿する", fontWeight = FontWeight.Bold)
+            }
+            if (selectedLocation == null) {
+                item { UiCard { Text("場所を選ぶと、その場所の口コミだけを表示します。", color = Muted) } }
+            } else {
+                item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text("${selectedLocation}の口コミ · ${reviews.size}件", fontWeight = FontWeight.Bold)
+                    Text("表示サンプル", style = MaterialTheme.typography.labelSmall, color = Muted)
+                } }
+                if (reviews.isEmpty()) item { UiCard { Text("この場所の口コミはまだありません。", color = Muted) } }
+                items(reviews, key = { it.id }) { review ->
+                    UiCard(modifier = Modifier.testTag("review-${review.id}"), border = feelPalette(review.feel).border) {
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(review.location, fontWeight = FontWeight.Bold)
+                            Badge(review.feel, feelPalette(review.feel))
+                        }
+                        Text(review.comment, style = MaterialTheme.typography.bodyMedium)
+                        Text(review.date, style = MaterialTheme.typography.labelSmall, color = Muted)
                     }
                 }
             }
         }
-        if (selectedLocation == null) {
-            item { UiCard { Text("場所を選ぶと、その場所の口コミだけを表示します。", color = Muted) } }
-        } else {
-            item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("${selectedLocation}の口コミ · ${reviews.size}件", fontWeight = FontWeight.Bold)
-                Text("表示サンプル", style = MaterialTheme.typography.labelSmall, color = Muted)
-            } }
-            if (reviews.isEmpty()) item { UiCard { Text("この場所の口コミはまだありません。", color = Muted) } }
-            items(reviews, key = { it.id }) { review ->
-                UiCard(modifier = Modifier.testTag("review-${review.id}"), border = feelPalette(review.feel).border) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(review.location, fontWeight = FontWeight.Bold)
-                        Badge(review.feel, feelPalette(review.feel))
-                    }
-                    Text(review.comment, style = MaterialTheme.typography.bodyMedium)
-                    Text(review.date, style = MaterialTheme.typography.labelSmall, color = Muted)
+        if (selectedLocation != null) {
+            Surface(color = Paper, modifier = Modifier.fillMaxWidth()) {
+                FilledTonalButton(
+                    onClick = { showForm = true },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).fillMaxWidth()
+                        .heightIn(min = 60.dp).testTag("community-post"),
+                    colors = ButtonDefaults.filledTonalButtonColors(containerColor = BlueSoft, contentColor = Blue),
+                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
+                ) {
+                    Icon(painterResource(R.drawable.ic_add), contentDescription = null, modifier = Modifier.size(26.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Text("いまの体感を投稿する", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
             }
         }
