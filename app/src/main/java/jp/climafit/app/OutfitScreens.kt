@@ -65,7 +65,7 @@ internal fun OutfitsScreen(model: LayeRoomViewModel) {
                         isError = temperature == null, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp))
                 }
                 Text(when {
-                    mode == TemperatureMode.ALL -> "写真は生成したサンプルです · ${visible.size}コーデ"
+                    mode == TemperatureMode.ALL -> "${visible.size}コーデ"
                     temperature == null -> "−50〜60℃の温度を入力してください。"
                     mode == TemperatureMode.CURRENT -> "${model.roomName}の室温 ${formatTemp(temperature)}℃ ±2℃"
                     mode == TemperatureMode.CUSTOM -> "指定の気温 ${formatTemp(temperature)}℃ ±2℃"
@@ -73,12 +73,12 @@ internal fun OutfitsScreen(model: LayeRoomViewModel) {
                 }, style = MaterialTheme.typography.bodySmall, color = Muted)
             }
         }
-        if (visible.isEmpty()) item { UiCard { Text("条件に合うサンプルコーデがありません。温度条件を変えてみてください。", color = Muted) } }
+        if (visible.isEmpty()) item { UiCard { Text("条件に合うコーデがありません。温度条件を変えてみてください。", color = Muted) } }
         items(visible, key = { it.id }) { outfit ->
             Surface(color = Color.White, shape = RoundedCornerShape(24.dp), border = androidx.compose.foundation.BorderStroke(1.dp, Outline)) {
                 Column {
                     Box {
-                        Image(painterResource(outfit.photo), contentDescription = "${outfit.title}の生成サンプル写真",
+                        Image(painterResource(outfit.photo), contentDescription = "${outfit.title}の写真",
                             modifier = Modifier.fillMaxWidth().height(320.dp).background(temperaturePalette(outfit.outdoorTemperature).background), contentScale = ContentScale.Fit)
                         Box(Modifier.padding(14.dp).align(Alignment.TopStart)) { Badge("金沢 ${formatTemp(outfit.outdoorTemperature)}℃", temperaturePalette(outfit.outdoorTemperature)) }
                     }

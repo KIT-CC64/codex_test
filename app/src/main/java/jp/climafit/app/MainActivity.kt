@@ -83,10 +83,6 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
                 }
             }
         }, actions = {
-            Badge("UIプレビュー")
-            IconButton(onClick = { model.message("表示確認用のサンプルデータです。") }) {
-                Icon(painterResource(R.drawable.ic_refresh), contentDescription = "表示データについて", tint = Orange)
-            }
             IconButton(onClick = { showRegistration = true }, modifier = Modifier.testTag("open-registration")) {
                 Icon(painterResource(R.drawable.ic_settings), contentDescription = "設定・ユーザー登録", tint = Orange)
             }
@@ -130,7 +126,6 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
     if (showRegistration) {
         RegistrationSheet(onDismiss = { showRegistration = false }, onSubmitPreview = {
             showRegistration = false
-            model.message("ユーザー登録画面のプレビューです。入力内容は送信・保存されず、アカウントは作成されません。")
         })
     }
     val pickerTarget = roomPicker

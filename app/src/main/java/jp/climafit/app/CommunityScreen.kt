@@ -41,7 +41,6 @@ internal fun CommunityScreen(model: LayeRoomViewModel, selectedLocation: String?
             } else {
                 item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text("${selectedLocation}の口コミ · ${reviews.size}件", fontWeight = FontWeight.Bold)
-                    Text("表示サンプル", style = MaterialTheme.typography.labelSmall, color = Muted)
                 } }
                 if (reviews.isEmpty()) item { UiCard { Text("この場所の口コミはまだありません。", color = Muted) } }
                 items(reviews, key = { it.id }) { review ->
@@ -85,9 +84,8 @@ internal fun CommunityScreen(model: LayeRoomViewModel, selectedLocation: String?
                     keyboardOptions = JapaneseKeyboardOptions, isError = comment.text.length > 500,
                     modifier = Modifier.fillMaxWidth(), minLines = 3, shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
                 Button(enabled = comment.text.isNotBlank() && comment.text.length <= 500, onClick = {
-                    showForm = false; model.message("投稿画面のプレビューです。内容は送信・保存されません。")
+                    showForm = false
                 }, modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(14.dp)) { Text("投稿する", fontWeight = FontWeight.Bold) }
-                Text("UIプレビューのため、投稿は送信されません。", style = MaterialTheme.typography.bodySmall, color = Muted)
             }
         }
     }

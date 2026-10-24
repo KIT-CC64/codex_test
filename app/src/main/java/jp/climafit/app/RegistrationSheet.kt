@@ -30,8 +30,6 @@ internal fun RegistrationSheet(onDismiss: () -> Unit, onSubmitPreview: () -> Uni
                 modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("registration-submit")) {
                 Text("登録する", fontWeight = FontWeight.Bold)
             }
-            Text("入力画面のプレビューです。内容は送信・保存されず、アカウントは作成されません。",
-                style = MaterialTheme.typography.bodySmall, color = Muted)
             TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) { Text("閉じる") }
         }
     }

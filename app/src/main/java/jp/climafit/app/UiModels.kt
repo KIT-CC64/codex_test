@@ -54,8 +54,8 @@ object PreviewData {
         RoomUi("実験室3", 19.5, 42, "64.2 · 肌寒い", "冷える部屋には、\nやさしい一枚を。", "長袖にライトジャケットを重ねて。冷気が気になる場所でも調節しやすい組み合わせです。", listOf("ライトジャケット", "白いトップス", "ゆったりパンツ"), R.drawable.outfit_cool),
     )
     val logs = listOf(
-        OutfitLogUi("preview-1", "10月24日", "201教室", 24.2, 18.5, "カーディガンで軽やかに", "生成したサンプル写真", R.drawable.outfit_warm),
-        OutfitLogUi("preview-2", "10月23日", "実験室3", 19.5, 17.0, "肌寒い日のライトジャケット", "生成したサンプル写真", R.drawable.outfit_cool),
+        OutfitLogUi("preview-1", "10月24日", "201教室", 24.2, 18.5, "カーディガンで軽やかに", "脱ぎ着しやすいカーディガンで、気温差に合わせて。", R.drawable.outfit_warm),
+        OutfitLogUi("preview-2", "10月23日", "実験室3", 19.5, 17.0, "肌寒い日のライトジャケット", "軽いジャケットを重ねて、ひんやりする日も心地よく。", R.drawable.outfit_cool),
     )
     val reviews = listOf(
         ReviewUi("preview-1", "図書館", "少し寒い", "窓際の席は少しひんやり。薄いカーディガンがあるとちょうどよかったです。", "10分前"),

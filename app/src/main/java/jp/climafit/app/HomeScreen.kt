@@ -39,7 +39,6 @@ internal fun HomeScreen(model: LayeRoomViewModel, onPhoto: () -> Unit, onChooseR
                         ClothingGuideRow("羽織り", guide.layer, R.drawable.guide_cardigan, Color(0xFFF2E9DA))
                     }
                     Text(guide.note, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = Ink)
-                    Text("服装の目安は表示サンプルです", style = MaterialTheme.typography.labelSmall, color = Muted)
                 }
             }
         }
