@@ -117,7 +117,7 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
                             onChooseRoom = { roomPicker = RoomPicker.HOME },
                             onSuggest = { model.requestSuggestionPreview(); aiMode = AiMode.SUGGEST })
                         Tab.OUTFITS -> OutfitsScreen(model)
-                        Tab.COMMUNITY -> CommunityScreen(model, communityLocation) { roomPicker = RoomPicker.COMMUNITY }
+                        Tab.COMMUNITY -> CommunityScreen(model, communityLocation)
                     }
                 }
             }
