@@ -112,6 +112,14 @@ internal fun OutfitsScreen(model: ClimaFitViewModel) {
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     TemperatureMode.entries.forEach { option -> FilterChip(selected = mode == option, onClick = { mode = option }, label = { Text(option.label) }) }
                 }
+                if (mode == TemperatureMode.CURRENT) {
+                    Selector(
+                        label = "室温を確認する場所",
+                        selected = model.roomName,
+                        options = model.rooms.map { it.name },
+                        onSelect = model::selectRoom,
+                    )
+                }
                 if (mode == TemperatureMode.CUSTOM) {
                     OutlinedTextField(custom, { custom = it }, label = { Text("金沢の気温（℃）") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true,
