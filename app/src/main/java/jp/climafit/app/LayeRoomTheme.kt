@@ -2,6 +2,11 @@ package jp.climafit.app
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,7 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-internal val Paper = Color(0xFFF8F5F0)
+internal val Paper = Color(0xFFFAF7F2)
 internal val Ink = Color(0xFF332C29)
 internal val Muted = Color(0xFF71665F)
 internal val Orange = Color(0xFFAD4827)
@@ -38,7 +43,24 @@ internal fun LayeRoomTheme(content: @Composable () -> Unit) {
         onPrimaryContainer = Ink, secondary = Blue, secondaryContainer = BlueSoft,
         onSecondaryContainer = Blue, background = Paper, surface = Paper,
         onSurface = Ink, onSurfaceVariant = Muted, outline = Outline,
-        surfaceVariant = Color(0xFFEDE5DD), tertiary = Green,
+        surfaceVariant = Color(0xFFF0E9E1), tertiary = Green,
+        surfaceContainerLow = Color(0xFFF5EFE7), surfaceContainer = Color(0xFFF0E9E1),
+        surfaceContainerHigh = Color(0xFFECE4DB),
+    ), shapes = Shapes(
+        extraSmall = RoundedCornerShape(8.dp), small = RoundedCornerShape(12.dp),
+        medium = RoundedCornerShape(16.dp), large = RoundedCornerShape(24.dp), extraLarge = RoundedCornerShape(28.dp),
+    ), typography = Typography(
+        headlineMedium = TextStyle(fontSize = 28.sp, lineHeight = 36.sp, fontWeight = FontWeight.Bold),
+        headlineSmall = TextStyle(fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.Bold),
+        titleLarge = TextStyle(fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold),
+        titleMedium = TextStyle(fontSize = 16.sp, lineHeight = 24.sp, fontWeight = FontWeight.SemiBold),
+        titleSmall = TextStyle(fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold),
+        bodyLarge = TextStyle(fontSize = 16.sp, lineHeight = 26.sp),
+        bodyMedium = TextStyle(fontSize = 14.sp, lineHeight = 22.sp),
+        bodySmall = TextStyle(fontSize = 12.sp, lineHeight = 19.sp),
+        labelLarge = TextStyle(fontSize = 14.sp, lineHeight = 20.sp, fontWeight = FontWeight.SemiBold),
+        labelMedium = TextStyle(fontSize = 12.sp, lineHeight = 18.sp, fontWeight = FontWeight.Medium),
+        labelSmall = TextStyle(fontSize = 11.sp, lineHeight = 16.sp, fontWeight = FontWeight.Medium),
     ), content = content)
 }
 @Composable
@@ -70,11 +92,29 @@ internal fun Selector(label: String, selected: String, options: List<String>, on
                 shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Outline),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Ink), contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp)) {
                 Text(selected, Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
-                Text("⌄")
+                Icon(painterResource(R.drawable.ic_expand_more), contentDescription = null, modifier = Modifier.size(24.dp))
             }
             DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                 options.forEach { option -> DropdownMenuItem(text = { Text(option) }, onClick = { expanded = false; onSelect(option) }) }
             }
         }
+    }
+}
+
+
+@Composable
+internal fun SymbolBadge(@DrawableRes symbol: Int, color: Color = Orange, background: Color = OrangeSoft) {
+    Surface(shape = RoundedCornerShape(16.dp), color = background) {
+        Box(Modifier.size(48.dp), contentAlignment = Alignment.Center) {
+            Icon(painterResource(symbol), contentDescription = null, tint = color, modifier = Modifier.size(26.dp))
+        }
+    }
+}
+
+@Composable
+internal fun ActionLabel(label: String, color: Color) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(label, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = color)
+        Icon(painterResource(R.drawable.ic_arrow_forward), contentDescription = null, tint = color, modifier = Modifier.size(18.dp))
     }
 }

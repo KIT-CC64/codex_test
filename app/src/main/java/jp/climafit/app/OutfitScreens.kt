@@ -40,16 +40,25 @@ internal fun OutfitsScreen(model: LayeRoomViewModel) {
         abs((if (mode == TemperatureMode.CURRENT) log.indoorTemperature else log.outdoorTemperature) - temperature) <= 2.0) }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text("気温別コーデ", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
-                Text("あの日の一着を、今日のヒントに。", color = Muted)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                SymbolBadge(R.drawable.ic_nav_outfits, Blue, BlueSoft)
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text("気温別コーデ", style = MaterialTheme.typography.headlineSmall)
+                    Text("あの日の一着を、今日のヒントに。", style = MaterialTheme.typography.bodySmall, color = Muted)
+                }
             }
         }
         item {
             UiCard {
-                Text("気温から、コーデを探す", fontWeight = FontWeight.Bold)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Icon(painterResource(R.drawable.ic_filter), contentDescription = null, tint = Blue, modifier = Modifier.size(20.dp))
+                    Text("気温から、コーデを探す", style = MaterialTheme.typography.titleMedium)
+                }
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TemperatureMode.entries.forEach { option -> FilterChip(selected = mode == option, onClick = { mode = option }, label = { Text(option.label) }) }
+                    TemperatureMode.entries.forEach { option ->
+                        FilterChip(selected = mode == option, onClick = { mode = option }, label = { Text(option.label) },
+                            leadingIcon = { if (mode == option) Icon(painterResource(R.drawable.ic_check), contentDescription = null, modifier = Modifier.size(18.dp)) })
+                    }
                 }
                 if (mode == TemperatureMode.CURRENT) {
                     Selector(

@@ -61,6 +61,36 @@ class FrontendUiTest {
         output.outputStream().use { rendered.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
+    @Test fun materialSymbolsRenderOfflineWithoutClippedCoordinates() {
+        val app = RuntimeEnvironment.getApplication()
+        val symbols = listOf(R.drawable.ic_home, R.drawable.ic_nav_outfits, R.drawable.ic_nav_people,
+            R.drawable.ic_camera, R.drawable.ic_nav_sun, R.drawable.ic_pin, R.drawable.ic_settings,
+            R.drawable.ic_back, R.drawable.ic_add, R.drawable.ic_expand_more, R.drawable.ic_arrow_forward,
+            R.drawable.ic_person, R.drawable.ic_save, R.drawable.ic_filter, R.drawable.ic_sun,
+            R.drawable.ic_check, R.drawable.ic_close)
+        val sheet = Bitmap.createBitmap(600, 360, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(sheet)
+        canvas.drawColor(android.graphics.Color.rgb(250, 247, 242))
+        symbols.forEachIndexed { index, resource ->
+            val bitmap = Bitmap.createBitmap(96, 96, Bitmap.Config.ARGB_8888)
+            val drawable = app.getDrawable(resource)!!
+            drawable.setBounds(12, 12, 84, 84)
+            drawable.draw(Canvas(bitmap))
+            var visible = 0
+            for (y in 0 until 96) for (x in 0 until 96) {
+                if (android.graphics.Color.alpha(bitmap.getPixel(x, y)) > 0) visible++
+            }
+            assertTrue("Blank or clipped symbol: $resource", visible > 100)
+            canvas.drawBitmap(bitmap, (index % 6 * 100 + 2).toFloat(), (index / 6 * 120).toFloat(), null)
+            val label = app.resources.getResourceEntryName(resource).removePrefix("ic_")
+            canvas.drawText(label, (index % 6 * 100 + 5).toFloat(), (index / 6 * 120 + 110).toFloat(),
+                android.graphics.Paint().apply { color = android.graphics.Color.DKGRAY; textSize = 11f; isAntiAlias = true })
+        }
+        val output = File("build/reports/material-symbols.png")
+        output.parentFile?.mkdirs()
+        output.outputStream().use { sheet.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+
     private var pickerLaunches = 0
     private fun showApp(photoResult: Uri? = null): LayeRoomViewModel {
         val model = LayeRoomViewModel(RuntimeEnvironment.getApplication())

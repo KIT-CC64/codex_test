@@ -8,6 +8,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -23,12 +24,13 @@ internal fun LocationPickerSheet(title: String, rooms: List<RoomUi>, selected: S
             }
             items(rooms, key = { it.name }) { room ->
                 ListItem(
+                    leadingContent = { Icon(painterResource(R.drawable.ic_pin), contentDescription = null, tint = if (selected == room.name) Orange else Muted) },
                     headlineContent = { Text(room.name, fontWeight = FontWeight.SemiBold) },
                     supportingContent = { Text("室温 ${formatTemp(room.temperature)}℃ · 湿度 ${room.humidity}%") },
                     trailingContent = { RadioButton(selected = selected == room.name, onClick = null) },
                     modifier = Modifier.fillMaxWidth().testTag("location-${room.name}")
                         .selectable(selected = selected == room.name, role = Role.RadioButton, onClick = { onSelect(room.name) }),
-                    colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                    colors = ListItemDefaults.colors(containerColor = if (selected == room.name) OrangeSoft else MaterialTheme.colorScheme.surfaceContainerLow),
                 )
             }
             item { Spacer(Modifier.height(20.dp)) }

@@ -83,7 +83,8 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
                 }
             }
         }, actions = {
-            IconButton(onClick = { showRegistration = true }, modifier = Modifier.testTag("open-registration")) {
+            FilledTonalIconButton(onClick = { showRegistration = true }, modifier = Modifier.padding(end = 12.dp).testTag("open-registration"),
+                colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = OrangeSoft, contentColor = Orange)) {
                 Icon(painterResource(R.drawable.ic_settings), contentDescription = "設定・ユーザー登録", tint = Orange)
             }
         }) },
@@ -96,7 +97,7 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
                         roomPicker = if (destination == Tab.COMMUNITY) RoomPicker.COMMUNITY else null
                     }, modifier = Modifier.testTag("tab-${destination.name}"),
                         icon = { Icon(painterResource(destination.icon), contentDescription = null,
-                            tint = if (destination == Tab.HOME) Orange else Color.Unspecified, modifier = Modifier.size(30.dp)) },
+                            tint = if (tab == destination) Orange else Muted, modifier = Modifier.size(26.dp)) },
                         label = { Text(destination.label, fontSize = 12.sp, maxLines = 1,
                             fontWeight = if (tab == destination) FontWeight.Bold else FontWeight.Medium) },
                         colors = NavigationBarItemDefaults.colors(selectedIconColor = Orange, selectedTextColor = Orange,

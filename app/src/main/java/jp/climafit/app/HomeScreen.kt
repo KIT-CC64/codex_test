@@ -31,8 +31,13 @@ internal fun HomeScreen(model: LayeRoomViewModel, onPhoto: () -> Unit, onChooseR
             Surface(shape = RoundedCornerShape(28.dp), color = Color.White, border = BorderStroke(1.dp, palette.border),
                 modifier = Modifier.fillMaxWidth().testTag("home-recommendation")) {
                 Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("今日の服装の目安", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
-                    Text("金沢の天気に合わせた、今日の3つ。", style = MaterialTheme.typography.bodySmall, color = Muted)
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        SymbolBadge(R.drawable.ic_sun)
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text("今日の服装の目安", style = MaterialTheme.typography.titleLarge)
+                            Text("金沢の天気に合わせた、今日の3つ。", style = MaterialTheme.typography.bodySmall, color = Muted)
+                        }
+                    }
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         ClothingGuideRow("トップス", guide.top, R.drawable.guide_tshirt, OrangeSoft)
                         ClothingGuideRow("ボトムス", guide.bottom, R.drawable.guide_trousers, BlueSoft)
@@ -47,16 +52,16 @@ internal fun HomeScreen(model: LayeRoomViewModel, onPhoto: () -> Unit, onChooseR
                 Surface(onClick = onPhoto, modifier = Modifier.weight(1f).fillMaxHeight().testTag("home-photo"),
                     color = OrangeSoft, shape = RoundedCornerShape(24.dp), border = BorderStroke(1.dp, OrangeLine)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Icon(painterResource(R.drawable.ic_camera), contentDescription = null, tint = Orange, modifier = Modifier.size(32.dp))
+                        SymbolBadge(R.drawable.ic_camera, Orange, Color.White.copy(alpha = 0.75f))
                         Text("写真で\nコーデ診断", fontSize = 19.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold, color = Orange)
                         Text("写真を選んですぐ診断へ", style = MaterialTheme.typography.labelSmall, color = Muted)
-                        Text("写真を選ぶ →", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Orange)
+                        ActionLabel("写真を選ぶ", Orange)
                     }
                 }
                 Surface(onClick = onSuggest, modifier = Modifier.weight(1f).fillMaxHeight().testTag("home-suggestion"),
                     color = BlueSoft, shape = RoundedCornerShape(24.dp), border = BorderStroke(1.dp, BlueLine)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Icon(painterResource(R.drawable.ic_nav_sun), contentDescription = null, tint = Blue, modifier = Modifier.size(32.dp))
+                        SymbolBadge(R.drawable.ic_nav_sun, Blue, Color.White.copy(alpha = 0.75f))
                         OutlinedButton(onClick = onChooseRoom,
                             modifier = Modifier.fillMaxWidth().testTag("home-room-picker").semantics { contentDescription = "おすすめの場所を選ぶ" },
                             shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Blue),
@@ -68,11 +73,11 @@ internal fun HomeScreen(model: LayeRoomViewModel, onPhoto: () -> Unit, onChooseR
                                 Text("場所を選ぶ", style = MaterialTheme.typography.labelSmall)
                                 Text(room.name, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold)
                             }
-                            Text("⌄", fontSize = 18.sp)
+                            Icon(painterResource(R.drawable.ic_expand_more), contentDescription = null, modifier = Modifier.size(20.dp))
                         }
                         Text("のおすすめ", fontSize = 19.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold, color = Blue)
                         Text("選んだ場所に合うコーデ", style = MaterialTheme.typography.labelSmall, color = Muted)
-                        Text("提案を見る →", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Blue)
+                        ActionLabel("提案を見る", Blue)
                     }
                 }
             }

@@ -6,6 +6,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -22,15 +24,22 @@ internal fun RegistrationSheet(onDismiss: () -> Unit, onSubmitPreview: () -> Uni
         Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp).padding(bottom = 24.dp).testTag("registration-sheet"),
             verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Text("ユーザー登録", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                SymbolBadge(R.drawable.ic_person)
+                Text("ユーザー登録", style = MaterialTheme.typography.headlineSmall)
+            }
             Text("あなたの名前で、今日のひろばへ。", color = Muted)
             OutlinedTextField(name, { name = it }, label = { Text("ユーザー名") }, singleLine = true,
-                keyboardOptions = JapaneseKeyboardOptions, modifier = Modifier.fillMaxWidth().testTag("registration-name"))
+                leadingIcon = { Icon(painterResource(R.drawable.ic_person), contentDescription = null) },
+                shape = MaterialTheme.shapes.medium, keyboardOptions = JapaneseKeyboardOptions, modifier = Modifier.fillMaxWidth().testTag("registration-name"))
             Button(onClick = onSubmitPreview, enabled = ready,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag("registration-submit")) {
                 Text("登録する", fontWeight = FontWeight.Bold)
             }
-            TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) { Text("閉じる") }
+            TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+                Icon(painterResource(R.drawable.ic_close), contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp)); Text("閉じる")
+            }
         }
     }
 }

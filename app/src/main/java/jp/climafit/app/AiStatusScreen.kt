@@ -58,11 +58,16 @@ internal fun AiStatusScreen(model: LayeRoomViewModel, mode: AiMode, onBack: () -
             }
         } else {
             UiCard {
-                Text("今日のおすすめコーデ", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    SymbolBadge(R.drawable.ic_nav_sun, Blue, BlueSoft)
+                    Text("今日のおすすめコーデ", style = MaterialTheme.typography.titleLarge)
+                }
                 Image(painterResource(R.drawable.outfit_warm), contentDescription = "おすすめのコーデ写真",
                     modifier = Modifier.fillMaxWidth().height(300.dp).clip(RoundedCornerShape(18.dp)), contentScale = ContentScale.Fit)
                 Text(model.rooms.firstOrNull { it.name == location }?.recommendationDescription.orEmpty(), color = Muted)
                 OutlinedButton(onClick = { /* Backend save action is not connected. */ }, modifier = Modifier.fillMaxWidth()) {
+                    Icon(painterResource(R.drawable.ic_save), contentDescription = null, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(8.dp))
                     Text("このコーデを保存")
                 }
             }
