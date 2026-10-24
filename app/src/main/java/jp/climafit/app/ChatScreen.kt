@@ -1,6 +1,10 @@
 package jp.climafit.app
 
 import android.content.ActivityNotFoundException
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -26,25 +30,76 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AiScreen(model: ClimaFitViewModel) {
+    var mode by rememberSaveable { mutableStateOf<AiMode?>(null) }
+    val selectedMode = mode
+    if (selectedMode == null) {
+        AiEntrance { mode = it }
+    } else {
+        fun backToEntrance() { model.clearPhoto(); mode = null }
+        BackHandler { backToEntrance() }
+        AiConversation(model, selectedMode, ::backToEntrance)
+    }
+}
+@Composable
+private fun AiEntrance(onSelect: (AiMode) -> Unit) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp)) {
+        Text("今日は、どちらから？", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
+        Text("写真で相談しても、提案から選んでも。\nあなたに合うコーデを一緒に見つけよう。", color = Muted)
+        AiChoiceCard("写真でコーデ診断", "服の写真を撮る・選ぶ → コーデを評価してもらう", R.drawable.ic_camera,
+            ClimatePalette(OrangeSoft, Orange, OrangeLine)) { onSelect(AiMode.PHOTO) }
+        AiChoiceCard("AIにコーデを提案してもらう", "気温・室温や、過去のコーデから相談する", R.drawable.ic_nav_sun,
+            ClimatePalette(BlueSoft, Blue, BlueLine)) { onSelect(AiMode.SUGGEST) }
+        Text("UIプレビューです。AIによる評価・提案やデータの保存は行いません。",
+            style = MaterialTheme.typography.bodySmall, color = Muted)
+    }
+}
+@Composable
+private fun AiChoiceCard(title: String, description: String, icon: Int, palette: ClimatePalette, onClick: () -> Unit) {
+    Surface(onClick = onClick, modifier = Modifier.fillMaxWidth(), color = palette.background,
+        shape = RoundedCornerShape(26.dp), border = BorderStroke(1.dp, palette.border)) {
+        Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Icon(painterResource(icon), contentDescription = null, modifier = Modifier.size(38.dp), tint = palette.foreground)
+            Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = palette.foreground)
+            Text(description, style = MaterialTheme.typography.bodyMedium, color = Ink)
+            Text("はじめる →", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = palette.foreground)
+        }
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AiConversation(model: ClimaFitViewModel, mode: AiMode, onBack: () -> Unit) {
     var text by rememberSaveable { mutableStateOf("") }
     var showPhotoOptions by rememberSaveable { mutableStateOf(false) }
     val list = rememberLazyListState()
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> uri?.let(model::loadPhoto) }
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap -> bitmap?.let(model::useCameraPreview) }
-    val messageCount = model.messages.size
+    val messages = model.messagesFor(mode)
+    val messageCount = messages.size
     LaunchedEffect(messageCount) { if (messageCount > 0) list.animateScrollToItem(messageCount - 1) }
     Column(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxWidth().background(Color.White).padding(horizontal = 18.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(7.dp)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("コーデAIと話そう", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Badge("会話サンプル", ClimatePalette(BlueSoft, Blue, BlueLine))
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                IconButton(onClick = onBack) {
+                    Icon(painterResource(R.drawable.ic_back), contentDescription = "最初の2つの選択肢に戻る")
+                }
+                Column(Modifier.weight(1f)) {
+                    Text(mode.title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text("${model.roomName} · 室温 ${formatTemp(model.room.temperature)}℃ / 金沢 ${formatTemp(model.outdoorTemperature)}℃",
+                        style = MaterialTheme.typography.labelSmall, color = Muted)
+                }
             }
-            Text("写真で相談 → お気に入りを残す → あなた向けの提案へ", style = MaterialTheme.typography.labelSmall, color = Muted)
+            if (mode == AiMode.PHOTO) {
+                FilledTonalButton(onClick = { showPhotoOptions = true }, enabled = !model.loadingPhoto, modifier = Modifier.fillMaxWidth()) {
+                    Icon(painterResource(R.drawable.ic_camera), contentDescription = null)
+                    Spacer(Modifier.width(8.dp)); Text("服の写真を撮る・選ぶ")
+                }
+            }
         }
         LazyColumn(state = list, modifier = Modifier.weight(1f).fillMaxWidth(), contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(18.dp)) {
-            items(model.messages, key = { it.id }) { message -> ChatBubble(message) {
+            items(messages, key = { it.id }) { message -> ChatBubble(message) {
                 model.message("保存ボタンの表示サンプルです。コーデは保存されません。")
             } }
         }
@@ -63,10 +118,10 @@ internal fun AiScreen(model: ClimaFitViewModel) {
                         Icon(painterResource(R.drawable.ic_image), contentDescription = "コーデの写真を添付", tint = Orange)
                     }
                     OutlinedTextField(value = text, onValueChange = { if (it.length <= 1000) text = it },
-                        modifier = Modifier.weight(1f), placeholder = { Text("今日のコーデ、どうかな？", style = MaterialTheme.typography.bodySmall) },
+                        modifier = Modifier.weight(1f), placeholder = { Text(if (mode == AiMode.PHOTO) "この服装、どうかな？" else "今日の服装を提案して", style = MaterialTheme.typography.bodySmall) },
                         shape = RoundedCornerShape(20.dp), maxLines = 4,
                         colors = OutlinedTextFieldDefaults.colors(unfocusedContainerColor = Paper, unfocusedBorderColor = Outline))
-                    FilledIconButton(onClick = { model.sendPreviewMessage(text); text = "" },
+                    FilledIconButton(onClick = { model.sendPreviewMessage(text, mode); text = "" },
                         enabled = !model.loadingPhoto && (text.isNotBlank() || model.photo != null), modifier = Modifier.size(48.dp)) {
                         Icon(painterResource(R.drawable.ic_send), contentDescription = "メッセージを送る（画面内プレビューのみ）")
                     }

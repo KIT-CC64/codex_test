@@ -25,6 +25,9 @@ data class ReviewUi(val id: String, val location: String, val feel: String, val 
 enum class TemperatureMode(val label: String) {
     ALL("すべて"), OUTDOOR("今の金沢"), CURRENT("今の室温"), CUSTOM("温度を指定")
 }
+enum class AiMode(val title: String) {
+    PHOTO("写真でコーデ診断"), SUGGEST("AIからのコーデ提案")
+}
 data class ChatMessageUi(
     val id: String,
     val text: String,

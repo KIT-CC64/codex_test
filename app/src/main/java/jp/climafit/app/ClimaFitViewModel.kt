@@ -27,16 +27,24 @@ class ClimaFitViewModel(application: Application) : AndroidViewModel(application
     var notice by mutableStateOf<String?>(null); private set
     var photo by mutableStateOf<Bitmap?>(null); private set
     var loadingPhoto by mutableStateOf(false); private set
-    val messages = mutableStateListOf(
-        ChatMessageUi("intro", "こんにちは。今日のコーデを一緒に考えましょう。写真と、行き先や気になることを教えてください。", false),
-        ChatMessageUi("sample-user", "このコーデで図書館に行こうと思うんだけど、どうかな？", true, samplePhoto = R.drawable.outfit_warm),
-        ChatMessageUi("sample-assistant", "【会話サンプル】カーディガンで調節しやすい組み合わせですね。図書館では羽織って、暖かい場所では脱ぐ、という着方のイメージです。", false, showSave = true),
+    private val photoMessages = mutableStateListOf(
+        ChatMessageUi("photo-intro", "今日のコーデを見せてください。写真を撮るか、写真から選んで、気になることを添えて相談できます。", false),
     )
+    private val suggestionMessages = mutableStateListOf(
+        ChatMessageUi("suggest-intro", "今日着る服を一緒に考えましょう。行き先や、どんな服装にしたいかを教えてください。気温や室温、過去のコーデを使った提案の画面サンプルです。", false),
+    )
+    fun messagesFor(mode: AiMode): List<ChatMessageUi> = if (mode == AiMode.PHOTO) photoMessages else suggestionMessages
     private var nextMessage = 1
-    fun sendPreviewMessage(text: String) {
+    fun sendPreviewMessage(text: String, mode: AiMode) {
         if ((text.isBlank() && photo == null) || loadingPhoto) return
-        messages.add(ChatMessageUi("user-${nextMessage++}", text.trim(), true, photo = photo))
-        messages.add(ChatMessageUi("assistant-${nextMessage++}", "これは画面確認用のサンプル応答です。実際のコーデ評価や、気温・室温に合わせた提案はAI連携後に表示されます。写真や文章は送信していません。", false, showSave = photo != null))
+        val messages = if (mode == AiMode.PHOTO) photoMessages else suggestionMessages
+        val attachedPhoto = photo
+        messages.add(ChatMessageUi("user-${nextMessage++}", text.trim(), true, photo = attachedPhoto))
+        messages.add(if (mode == AiMode.PHOTO) {
+            ChatMessageUi("assistant-${nextMessage++}", "【診断画面のサンプル応答】写真や文章は送信していません。実際の評価・アドバイスはAI連携後に表示されます。", false, showSave = attachedPhoto != null)
+        } else {
+            ChatMessageUi("assistant-${nextMessage++}", "【提案画面のサンプル応答】カーディガンとシャツを組み合わせた表示例です。実際には、気温や室温、過去のコーデをもとにしたAIの提案をここに表示します。", false, samplePhoto = R.drawable.outfit_warm, showSave = true)
+        })
         clearPhoto()
     }
     fun useCameraPreview(bitmap: Bitmap) { clearPhoto(); photo = bitmap }
