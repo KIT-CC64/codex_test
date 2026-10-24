@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 internal fun HomeScreen(model: LayeRoomViewModel, onPhoto: () -> Unit, onChooseRoom: () -> Unit, onSuggest: () -> Unit) {
     val room = model.room
-    val palette = temperaturePalette(room.temperature)
-    val guide = PreviewData.clothingGuides.getValue(room.name)
+    val palette = temperaturePalette(model.outdoorTemperature)
+    val guide = PreviewData.kanazawaClothingGuide
     LazyColumn(Modifier.fillMaxSize().testTag("home-screen"), contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item {
@@ -32,22 +32,7 @@ internal fun HomeScreen(model: LayeRoomViewModel, onPhoto: () -> Unit, onChooseR
                 modifier = Modifier.fillMaxWidth().testTag("home-recommendation")) {
                 Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("今日の服装の目安", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.ExtraBold)
-                    Surface(color = Paper, shape = RoundedCornerShape(18.dp), border = BorderStroke(1.dp, Outline),
-                        modifier = Modifier.fillMaxWidth()) {
-                        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                            Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), verticalAlignment = Alignment.CenterVertically) {
-                                EnvironmentValue("場所", room.name, Ink)
-                                VerticalDivider(Modifier.fillMaxHeight(), color = Outline)
-                                EnvironmentValue("金沢の気温", "${formatTemp(model.outdoorTemperature)}℃", temperaturePalette(model.outdoorTemperature).foreground)
-                                VerticalDivider(Modifier.fillMaxHeight(), color = Outline)
-                                EnvironmentValue("室温", "${formatTemp(room.temperature)}℃", palette.foreground)
-                            }
-                            HorizontalDivider(color = Outline)
-                            Text("湿度 ${room.humidity}%  ·  快適さ ${room.discomfort}",
-                                style = MaterialTheme.typography.labelSmall, color = Muted)
-                        }
-                    }
-                    Text("何を着よう？ まずは、この3つ。", style = MaterialTheme.typography.bodySmall, color = Muted)
+                    Text("金沢の天気に合わせた、今日の3つ。", style = MaterialTheme.typography.bodySmall, color = Muted)
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         ClothingGuideRow("トップス", guide.top, R.drawable.guide_tshirt, OrangeSoft)
                         ClothingGuideRow("ボトムス", guide.bottom, R.drawable.guide_trousers, BlueSoft)
@@ -108,16 +93,5 @@ private fun ClothingGuideRow(label: String, clothing: String, image: Int, backgr
                 Text(clothing, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             }
         }
-    }
-}
-
-
-@Composable
-private fun RowScope.EnvironmentValue(label: String, value: String, color: Color) {
-    Column(Modifier.weight(1f).padding(horizontal = 4.dp), horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(label, style = MaterialTheme.typography.labelSmall, color = Muted)
-        Text(value, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = color,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center)
     }
 }

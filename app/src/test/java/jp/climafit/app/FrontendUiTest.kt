@@ -139,6 +139,7 @@ class FrontendUiTest {
         compose.runOnIdle { assertNull(model.latestAiRequest) }
         selectLocation("201教室")
         compose.onNodeWithTag("home-screen").assertExists()
+        compose.onNodeWithText(PreviewData.kanazawaClothingGuide.note).assertExists()
         compose.runOnIdle { assertNull(model.latestAiRequest); assertEquals("201教室", model.roomName) }
         revealHomeAction("home-suggestion")
         compose.onNodeWithTag("home-suggestion").performTouchInput {

@@ -41,11 +41,10 @@ const val TODAY_OUTFIT_PROMPT = "今日の服装を提案して"
 /** Fixed copy for the clothing guide preview; no temperature-based recommendation logic. */
 data class ClothingGuideUi(val top: String, val bottom: String, val layer: String, val note: String)
 object PreviewData {
-    val clothingGuides = mapOf(
-        "図書館" to ClothingGuideUi("Tシャツ", "薄手のズボン", "薄手のカーディガン", "図書館では羽織りを一枚。脱ぎ着しやすい服で、心地よく。"),
-        "201教室" to ClothingGuideUi("Tシャツ", "薄手のズボン", "薄手のカーディガン", "教室では軽やかに。移動するときのために、羽織りを持って。"),
-        "学生食堂" to ClothingGuideUi("Tシャツ", "薄手のズボン", "持ち歩けるカーディガン", "食堂では涼しく、屋外では一枚プラス。調整しやすい服装に。"),
-        "実験室3" to ClothingGuideUi("長袖トップス", "薄手のズボン", "カーディガン", "ひんやりする部屋では、長袖と羽織りで調整を。"),
+    // City weather preview, independent of the room selected for AI suggestions.
+    val kanazawaClothingGuide = ClothingGuideUi(
+        "Tシャツ", "薄手のズボン", "薄手のカーディガン",
+        "金沢では、朝晩の冷えに備えて羽織りを一枚。脱ぎ着しやすい服装で出かけましょう。",
     )
     const val outdoorTemperature = 18.5
     val rooms = listOf(
