@@ -16,7 +16,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -65,15 +64,21 @@ internal fun HomeScreen(model: LayeRoomViewModel, onPhoto: () -> Unit, onChooseR
                     color = BlueSoft, shape = RoundedCornerShape(24.dp), border = BorderStroke(1.dp, BlueLine)) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Icon(painterResource(R.drawable.ic_nav_sun), contentDescription = null, tint = Blue, modifier = Modifier.size(32.dp))
-                        TextButton(onClick = onChooseRoom, modifier = Modifier.testTag("home-room-picker").semantics { contentDescription = "おすすめの場所を選ぶ" },
-                            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp),
-                            colors = ButtonDefaults.textButtonColors(contentColor = Blue)) {
-                            Text(room.name, fontSize = 18.sp, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                                textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f, fill = false))
-                            Text(" ⌄", fontSize = 18.sp)
+                        OutlinedButton(onClick = onChooseRoom,
+                            modifier = Modifier.fillMaxWidth().testTag("home-room-picker").semantics { contentDescription = "おすすめの場所を選ぶ" },
+                            shape = RoundedCornerShape(14.dp), border = BorderStroke(1.dp, Blue),
+                            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Blue, containerColor = Color.White.copy(alpha = 0.7f))) {
+                            Icon(painterResource(R.drawable.ic_pin), contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text("場所を選ぶ", style = MaterialTheme.typography.labelSmall)
+                                Text(room.name, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.Bold)
+                            }
+                            Text("⌄", fontSize = 18.sp)
                         }
                         Text("のおすすめ", fontSize = 19.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold, color = Blue)
-                        Text("場所名で変更できます", style = MaterialTheme.typography.labelSmall, color = Muted)
+                        Text("選んだ場所に合うコーデ", style = MaterialTheme.typography.labelSmall, color = Muted)
                         Text("提案を見る →", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Blue)
                     }
                 }

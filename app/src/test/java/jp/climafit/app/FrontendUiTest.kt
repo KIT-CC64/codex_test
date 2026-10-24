@@ -221,7 +221,7 @@ class FrontendUiTest {
         compose.onNodeWithText("201教室の室温 24.2℃ ±2℃").assertExists()
         compose.onNodeWithText("温度を指定").performScrollTo().performClick()
         compose.onNode(hasSetTextAction()).performTextReplacement("17")
-        compose.onNodeWithText("金沢の気温 17.0℃ ±2℃").assertExists()
+        compose.onNodeWithText("指定の気温 17.0℃ ±2℃").assertExists()
         compose.onNode(hasScrollToIndexAction()).performScrollToNode(hasText("肌寒い日のライトジャケット"))
         compose.onNodeWithText("肌寒い日のライトジャケット").assertExists()
     }

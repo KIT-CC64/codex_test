@@ -60,7 +60,7 @@ internal fun OutfitsScreen(model: LayeRoomViewModel) {
                     )
                 }
                 if (mode == TemperatureMode.CUSTOM) {
-                    OutlinedTextField(custom, { custom = it }, label = { Text("金沢の気温（℃）") },
+                    OutlinedTextField(custom, { custom = it }, label = { Text("指定の気温（℃）") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal), singleLine = true,
                         isError = temperature == null, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp))
                 }
@@ -68,6 +68,7 @@ internal fun OutfitsScreen(model: LayeRoomViewModel) {
                     mode == TemperatureMode.ALL -> "写真は生成したサンプルです · ${visible.size}コーデ"
                     temperature == null -> "−50〜60℃の温度を入力してください。"
                     mode == TemperatureMode.CURRENT -> "${model.roomName}の室温 ${formatTemp(temperature)}℃ ±2℃"
+                    mode == TemperatureMode.CUSTOM -> "指定の気温 ${formatTemp(temperature)}℃ ±2℃"
                     else -> "金沢の気温 ${formatTemp(temperature)}℃ ±2℃"
                 }, style = MaterialTheme.typography.bodySmall, color = Muted)
             }
