@@ -23,10 +23,12 @@ internal fun AiStatusScreen(model: LayeRoomViewModel, mode: AiMode, onBack: () -
     val location = request?.location ?: model.roomName
     Column(Modifier.fillMaxSize().testTag(if (mode == AiMode.PHOTO) "photo-diagnosis-screen" else "suggestion-screen")
         .verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(painterResource(R.drawable.ic_back), contentDescription = "ホームに戻る") }
             Text(if (mode == AiMode.PHOTO) "コーデ診断" else "${location}のおすすめ",
+                modifier = Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.width(48.dp))
         }
         UiCard(color = BlueSoft, border = BlueLine) {
             Text("${location} · 室温 ${formatTemp(request?.indoorTemperature ?: model.room.temperature)}℃", color = Blue, fontWeight = FontWeight.Bold)
@@ -58,10 +60,7 @@ internal fun AiStatusScreen(model: LayeRoomViewModel, mode: AiMode, onBack: () -
             }
         } else {
             UiCard {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SymbolBadge(R.drawable.ic_nav_sun, Blue, BlueSoft)
-                    Text("今日のおすすめコーデ", style = MaterialTheme.typography.titleLarge)
-                }
+                CenteredHeading("今日のおすすめコーデ", "", R.drawable.ic_nav_sun, Blue, BlueSoft)
                 Image(painterResource(R.drawable.outfit_warm), contentDescription = "おすすめのコーデ写真",
                     modifier = Modifier.fillMaxWidth().height(300.dp).clip(RoundedCornerShape(18.dp)), contentScale = ContentScale.Fit)
                 Text(model.rooms.firstOrNull { it.name == location }?.recommendationDescription.orEmpty(), color = Muted)

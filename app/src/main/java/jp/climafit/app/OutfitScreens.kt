@@ -40,13 +40,7 @@ internal fun OutfitsScreen(model: LayeRoomViewModel) {
         abs((if (mode == TemperatureMode.CURRENT) log.indoorTemperature else log.outdoorTemperature) - temperature) <= 2.0) }
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                SymbolBadge(R.drawable.ic_nav_outfits, Blue, BlueSoft)
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text("気温別コーデ", style = MaterialTheme.typography.headlineSmall)
-                    Text("あの日の一着を、今日のヒントに。", style = MaterialTheme.typography.bodySmall, color = Muted)
-                }
-            }
+            CenteredHeading("気温別コーデ", "あの日の一着を、今日のヒントに。", R.drawable.ic_nav_outfits, Blue, BlueSoft)
         }
         item {
             UiCard {

@@ -73,15 +73,16 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
     BackHandler(enabled = aiMode != null) { backHome() }
     Scaffold(
         containerColor = Paper,
-        topBar = { TopAppBar(colors = TopAppBarDefaults.topAppBarColors(containerColor = Paper), title = {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Image(painterResource(R.drawable.ic_layeroom_mark), contentDescription = null, modifier = Modifier.size(38.dp))
-                Column(Modifier.weight(1f)) {
+        topBar = { CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Paper),
+            navigationIcon = {
+                Image(painterResource(R.drawable.ic_layeroom_mark), contentDescription = null,
+                    modifier = Modifier.padding(start = 12.dp, end = 10.dp).size(38.dp))
+            }, title = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontWeight = FontWeight.ExtraBold, letterSpacing = (-0.7).sp)
                     Text("レイルーム · 今日の一着を、心地よく。", style = MaterialTheme.typography.labelSmall,
                         fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = Muted)
                 }
-            }
         }, actions = {
             FilledTonalIconButton(onClick = { showRegistration = true }, modifier = Modifier.padding(end = 12.dp).testTag("open-registration"),
                 colors = IconButtonDefaults.filledTonalIconButtonColors(containerColor = OrangeSoft, contentColor = Orange)) {

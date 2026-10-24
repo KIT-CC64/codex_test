@@ -28,13 +28,7 @@ internal fun CommunityScreen(model: LayeRoomViewModel, selectedLocation: String?
         LazyColumn(Modifier.fillMaxWidth().weight(1f).testTag("community-screen"), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        SymbolBadge(R.drawable.ic_nav_people, Green, GreenSoft)
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text("今日のひろば", style = MaterialTheme.typography.headlineSmall)
-                            Text("教室の「ちょっと寒い」を、シェアしよう。", style = MaterialTheme.typography.bodySmall, color = Muted)
-                        }
-                    }
+                    CenteredHeading("今日のひろば", "教室の「ちょっと寒い」を、シェアしよう。", R.drawable.ic_nav_people, Green, GreenSoft)
                     OutlinedButton(onClick = onChooseLocation, modifier = Modifier.fillMaxWidth().testTag("community-location")) {
                         Icon(painterResource(R.drawable.ic_pin), contentDescription = null)
                         Spacer(Modifier.width(8.dp)); Text(selectedLocation?.let { "$it · 場所を変更" } ?: "口コミを見る場所を選ぶ")
@@ -80,11 +74,7 @@ internal fun CommunityScreen(model: LayeRoomViewModel, selectedLocation: String?
         ModalBottomSheet(onDismissRequest = { showForm = false }, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
             Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp).padding(bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SymbolBadge(R.drawable.ic_nav_people, Blue, BlueSoft)
-                    Text("いまの体感をシェア", style = MaterialTheme.typography.headlineSmall)
-                }
-                Text("どこで、どんなふうに感じた？", color = Muted)
+                CenteredHeading("いまの体感をシェア", "どこで、どんなふうに感じた？", R.drawable.ic_nav_people, Blue, BlueSoft)
                 Selector("場所", location, model.rooms.map { it.name }) { location = it }
                 Selector("体感", feel, listOf("快適", "少し寒い", "かなり寒い", "少し暑い")) { feel = it }
                 OutlinedTextField(comment, { comment = it }, label = { Text("ひとこと") },

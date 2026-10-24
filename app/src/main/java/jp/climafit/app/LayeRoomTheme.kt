@@ -113,8 +113,25 @@ internal fun SymbolBadge(@DrawableRes symbol: Int, color: Color = Orange, backgr
 
 @Composable
 internal fun ActionLabel(label: String, color: Color) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)) {
         Text(label, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = color)
         Icon(painterResource(R.drawable.ic_arrow_forward), contentDescription = null, tint = color, modifier = Modifier.size(18.dp))
+    }
+}
+
+
+@Composable
+internal fun CenteredHeading(title: String, subtitle: String, @DrawableRes symbol: Int,
+    color: Color = Orange, background: Color = OrangeSoft) {
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            SymbolBadge(symbol, color, background)
+            Text(title, Modifier.weight(1f).padding(horizontal = 4.dp),
+                style = MaterialTheme.typography.titleLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            Spacer(Modifier.width(48.dp))
+        }
+        if (subtitle.isNotBlank()) Text(subtitle, Modifier.fillMaxWidth(), color = Muted,
+            style = MaterialTheme.typography.bodySmall, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
     }
 }

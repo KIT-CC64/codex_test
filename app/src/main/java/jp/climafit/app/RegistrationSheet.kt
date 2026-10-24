@@ -24,11 +24,7 @@ internal fun RegistrationSheet(onDismiss: () -> Unit, onSubmitPreview: () -> Uni
         Column(Modifier.fillMaxWidth().imePadding().verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp).padding(bottom = 24.dp).testTag("registration-sheet"),
             verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                SymbolBadge(R.drawable.ic_person)
-                Text("ユーザー登録", style = MaterialTheme.typography.headlineSmall)
-            }
-            Text("あなたの名前で、今日のひろばへ。", color = Muted)
+            CenteredHeading("ユーザー登録", "あなたの名前で、今日のひろばへ。", R.drawable.ic_person)
             OutlinedTextField(name, { name = it }, label = { Text("ユーザー名") }, singleLine = true,
                 leadingIcon = { Icon(painterResource(R.drawable.ic_person), contentDescription = null) },
                 shape = MaterialTheme.shapes.medium, keyboardOptions = JapaneseKeyboardOptions, modifier = Modifier.fillMaxWidth().testTag("registration-name"))

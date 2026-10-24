@@ -19,8 +19,8 @@ internal fun LocationPickerSheet(title: String, rooms: List<RoomUi>, selected: S
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)) {
         LazyColumn(Modifier.fillMaxWidth().testTag("location-sheet"), contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp)) {
             item {
-                Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                Text("登録されている場所から1つ選んでください。", Modifier.padding(vertical = 12.dp), color = Muted)
+                CenteredHeading(title, "登録されている場所から1つ選んでください。", R.drawable.ic_pin)
+                Spacer(Modifier.height(12.dp))
             }
             items(rooms, key = { it.name }) { room ->
                 ListItem(
