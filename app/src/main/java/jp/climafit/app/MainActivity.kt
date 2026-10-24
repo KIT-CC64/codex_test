@@ -4,20 +4,25 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 private enum class Tab(val label: String, val icon: Int) {
-    DASHBOARD("提案", R.drawable.ic_home), AI("コーデAI", R.drawable.ic_chat),
-    LOGS("気温別コーデ", R.drawable.ic_outfits), REVIEWS("みんなのひろば", R.drawable.ic_people)
+    DASHBOARD("提案", R.drawable.ic_nav_sun), AI("コーデAI", R.drawable.ic_nav_chat),
+    LOGS("気温別コーデ", R.drawable.ic_nav_outfits), REVIEWS("みんなのひろば", R.drawable.ic_nav_people)
 }
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,9 +42,12 @@ private fun ClimaFitApp(model: ClimaFitViewModel = viewModel()) {
     Scaffold(
         containerColor = Paper,
         topBar = { TopAppBar(colors = TopAppBarDefaults.topAppBarColors(containerColor = Paper), title = {
-            Column {
-                Text("ClimaFit", fontWeight = FontWeight.ExtraBold, letterSpacing = (-0.7).sp)
-                Text("金沢の毎日に、心地よい一着。", style = MaterialTheme.typography.labelSmall, color = Muted)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Image(painterResource(R.drawable.ic_climafit_brand), contentDescription = null, modifier = Modifier.size(38.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("ClimaFit", fontWeight = FontWeight.ExtraBold, letterSpacing = (-0.7).sp)
+                    Text("金沢の毎日に、心地よい一着。", style = MaterialTheme.typography.labelSmall, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = Muted)
+                }
             }
         }, actions = {
             Badge("UIプレビュー")
@@ -51,7 +59,8 @@ private fun ClimaFitApp(model: ClimaFitViewModel = viewModel()) {
             NavigationBar(containerColor = androidx.compose.ui.graphics.Color.White) {
                 Tab.entries.forEach { destination ->
                     NavigationBarItem(selected = tab == destination, onClick = { tab = destination },
-                        icon = { Icon(painterResource(destination.icon), contentDescription = null) },
+                        icon = { Icon(painterResource(destination.icon), contentDescription = null,
+                            tint = Color.Unspecified, modifier = Modifier.size(30.dp)) },
                         label = { Text(destination.label, fontSize = 10.sp, maxLines = 1,
                             fontWeight = if (tab == destination) FontWeight.Bold else FontWeight.Medium) },
                         colors = NavigationBarItemDefaults.colors(selectedIconColor = Orange, selectedTextColor = Orange,
