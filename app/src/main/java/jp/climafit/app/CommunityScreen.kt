@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CommunityScreen(model: LayeRoomViewModel, selectedLocation: String?) {
+internal fun CommunityScreen(model: LayeRoomViewModel, selectedLocation: String?, onChooseLocation: () -> Unit) {
     var showForm by rememberSaveable { mutableStateOf(false) }
     var location by rememberSaveable(selectedLocation) { mutableStateOf(selectedLocation ?: model.roomName) }
     var feel by rememberSaveable { mutableStateOf("快適") }
@@ -29,6 +29,10 @@ internal fun CommunityScreen(model: LayeRoomViewModel, selectedLocation: String?
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("今日のひろば", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
                 Text("教室の「ちょっと寒い」を、シェアしよう。", style = MaterialTheme.typography.bodyMedium, color = Muted)
+                OutlinedButton(onClick = onChooseLocation, modifier = Modifier.fillMaxWidth().testTag("community-location")) {
+                    Icon(painterResource(R.drawable.ic_pin), contentDescription = null)
+                    Spacer(Modifier.width(8.dp)); Text(selectedLocation?.let { "$it · 場所を変更" } ?: "口コミを見る場所を選ぶ")
+                }
                 if (selectedLocation != null) {
                     FilledTonalButton(onClick = { showForm = true }, modifier = Modifier.fillMaxWidth()) {
                         Icon(painterResource(R.drawable.ic_add), contentDescription = null)
@@ -38,7 +42,7 @@ internal fun CommunityScreen(model: LayeRoomViewModel, selectedLocation: String?
             }
         }
         if (selectedLocation == null) {
-            item { UiCard { Text("下の「今日のひろば」タブをタップして場所を選ぶと、その場所の口コミを表示します。", color = Muted) } }
+            item { UiCard { Text("場所を選ぶと、その場所の口コミだけを表示します。", color = Muted) } }
         } else {
             item { Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("${selectedLocation}の口コミ · ${reviews.size}件", fontWeight = FontWeight.Bold)
