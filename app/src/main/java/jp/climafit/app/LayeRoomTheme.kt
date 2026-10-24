@@ -32,7 +32,7 @@ internal fun feelPalette(feel: String) = when {
     else -> ClimatePalette(GreenSoft, Green, Color(0xFFA6C8B2))
 }
 @Composable
-internal fun ClimaFitTheme(content: @Composable () -> Unit) {
+internal fun LayeRoomTheme(content: @Composable () -> Unit) {
     MaterialTheme(colorScheme = lightColorScheme(
         primary = Orange, onPrimary = Color.White, primaryContainer = OrangeSoft,
         onPrimaryContainer = Ink, secondary = Blue, secondaryContainer = BlueSoft,

@@ -27,7 +27,7 @@ import java.util.Locale
 import kotlin.math.abs
 
 @Composable
-internal fun Dashboard(model: ClimaFitViewModel, onConsult: () -> Unit) {
+internal fun Dashboard(model: LayeRoomViewModel, onConsult: () -> Unit) {
     val room = model.room
     val palette = temperaturePalette(room.temperature)
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -88,7 +88,7 @@ private fun TemperatureTile(title: String, temperature: Double, detail: String, 
     }
 }
 @Composable
-internal fun OutfitsScreen(model: ClimaFitViewModel) {
+internal fun OutfitsScreen(model: LayeRoomViewModel) {
     var mode by rememberSaveable { mutableStateOf(TemperatureMode.ALL) }
     var custom by rememberSaveable { mutableStateOf("18") }
     val temperature = when (mode) {

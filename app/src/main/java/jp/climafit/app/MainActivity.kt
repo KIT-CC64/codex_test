@@ -28,12 +28,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { ClimaFitTheme { ClimaFitApp() } }
+        setContent { LayeRoomTheme { LayeRoomApp() } }
     }
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ClimaFitApp(model: ClimaFitViewModel = viewModel()) {
+private fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
     var tab by rememberSaveable { mutableStateOf(Tab.DASHBOARD) }
     val snackbar = remember { SnackbarHostState() }
     val screens = rememberSaveableStateHolder()
@@ -43,10 +43,10 @@ private fun ClimaFitApp(model: ClimaFitViewModel = viewModel()) {
         containerColor = Paper,
         topBar = { TopAppBar(colors = TopAppBarDefaults.topAppBarColors(containerColor = Paper), title = {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Image(painterResource(R.drawable.ic_climafit_mark), contentDescription = null, modifier = Modifier.size(38.dp))
+                Image(painterResource(R.drawable.ic_layeroom_mark), contentDescription = null, modifier = Modifier.size(38.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("ClimaFit", fontWeight = FontWeight.ExtraBold, letterSpacing = (-0.7).sp)
-                    Text("金沢の毎日に、心地よい一着。", style = MaterialTheme.typography.labelSmall, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = Muted)
+                    Text(androidx.compose.ui.res.stringResource(R.string.app_name), fontWeight = FontWeight.ExtraBold, letterSpacing = (-0.7).sp)
+                    Text("レイルーム · 今日の一着を、心地よく。", style = MaterialTheme.typography.labelSmall, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = Muted)
                 }
             }
         }, actions = {

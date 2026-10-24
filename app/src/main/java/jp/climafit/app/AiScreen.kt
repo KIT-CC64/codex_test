@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun AiScreen(model: ClimaFitViewModel) {
+internal fun AiScreen(model: LayeRoomViewModel) {
     var mode by rememberSaveable { mutableStateOf<AiMode?>(null) }
     val selectedMode = mode
     if (selectedMode == null) {
@@ -62,7 +62,7 @@ private fun AiChoiceCard(title: String, description: String, icon: Int, palette:
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AiActionScreen(model: ClimaFitViewModel, mode: AiMode, onBack: () -> Unit) {
+private fun AiActionScreen(model: LayeRoomViewModel, mode: AiMode, onBack: () -> Unit) {
     var showPhotoOptions by rememberSaveable { mutableStateOf(false) }
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> uri?.let(model::loadPhoto) }
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap -> bitmap?.let(model::useCameraPreview) }
@@ -128,7 +128,7 @@ private fun AiActionScreen(model: ClimaFitViewModel, mode: AiMode, onBack: () ->
     }
 }
 @Composable
-private fun AiResultCard(model: ClimaFitViewModel, mode: AiMode) {
+private fun AiResultCard(model: LayeRoomViewModel, mode: AiMode) {
     UiCard {
         Badge("表示サンプル")
         Text(if (mode == AiMode.PHOTO) "診断結果" else "今日のおすすめコーデ",

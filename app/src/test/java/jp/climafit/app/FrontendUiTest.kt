@@ -30,6 +30,8 @@ class FrontendUiTest {
         val app = RuntimeEnvironment.getApplication()
         val manager = app.packageManager
         val info = manager.getActivityInfo(ComponentName(app, MainActivity::class.java), 0)
+        assertEquals("LayeRoom", info.loadLabel(manager).toString())
+        assertEquals("LayeRoom", app.getString(R.string.app_name))
         val icon = info.loadIcon(manager)
         assertTrue("Activity icon must inflate as an adaptive icon", icon is AdaptiveIconDrawable)
         fun render(drawable: Drawable): Bitmap = Bitmap.createBitmap(192, 192, Bitmap.Config.ARGB_8888).also {
@@ -42,9 +44,9 @@ class FrontendUiTest {
         output.outputStream().use { rendered.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
-    private fun showAi(): ClimaFitViewModel {
-        val model = ClimaFitViewModel(RuntimeEnvironment.getApplication())
-        compose.setContent { ClimaFitTheme { AiScreen(model) } }
+    private fun showAi(): LayeRoomViewModel {
+        val model = LayeRoomViewModel(RuntimeEnvironment.getApplication())
+        compose.setContent { LayeRoomTheme { AiScreen(model) } }
         return model
     }
 
@@ -85,8 +87,8 @@ class FrontendUiTest {
     }
 
     @Test fun communityStillAcceptsJapaneseAndFullWidthCharacters() {
-        val model = ClimaFitViewModel(RuntimeEnvironment.getApplication())
-        compose.setContent { ClimaFitTheme { CommunityScreen(model) } }
+        val model = LayeRoomViewModel(RuntimeEnvironment.getApplication())
+        compose.setContent { LayeRoomTheme { CommunityScreen(model) } }
         compose.onNodeWithText("いまの体感を投稿する").performClick()
         val japanese = "図書館は少し寒いです。全角ＡＢＣ１２３"
         compose.onNode(hasSetTextAction()).performClick().performTextInput(japanese)

@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun CommunityScreen(model: ClimaFitViewModel) {
+internal fun CommunityScreen(model: LayeRoomViewModel) {
     var showForm by rememberSaveable { mutableStateOf(false) }
     var location by rememberSaveable { mutableStateOf(model.roomName) }
     var feel by rememberSaveable { mutableStateOf("快適") }

@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** Frontend presentation state only. Nothing is saved or sent to a server. */
-class ClimaFitViewModel(application: Application) : AndroidViewModel(application) {
+class LayeRoomViewModel(application: Application) : AndroidViewModel(application) {
     val rooms = PreviewData.rooms
     val outdoorTemperature = PreviewData.outdoorTemperature
     val logs = PreviewData.logs
