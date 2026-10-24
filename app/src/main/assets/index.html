@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>室温×天気 服装提案アプリ</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="icons/css/all.min.css">
+    <style>
+        /* Mobile Viewport Simulation & Styling */
+        body {
+            background-color: #292524;
+            font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #44403c;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 430px;
+            height: 100vh;
+            max-height: 932px;
+            background: #fdfbf7;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -15px rgba(67, 52, 37, 0.25);
+        }
+        @media (min-width: 640px) {
+            .app-container {
+                height: 880px;
+                border-radius: 40px;
+                border: 8px solid #44403c;
+            }
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .glass-panel {
+            background: rgba(253, 251, 247, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    body {background:#fdfbf7} .app-container {max-width:600px;height:100dvh;max-height:none;border:0;border-radius:0;box-shadow:none} input,select,button{font:inherit} button,input,select{min-height:44px} button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #e05d38;outline-offset:2px} input:disabled{opacity:.5} nav{padding-bottom:max(8px,env(safe-area-inset-bottom))} .nav-btn{min-height:48px} </style>
+</head>
+<body>
+
+<div class="app-container"><div id="notice" role="status" aria-live="polite" class="hidden bg-peach-100 text-warm-900 p-3 text-xs"></div>
+
+    <!-- Top Header -->
+    <header class="glass-panel sticky top-0 z-30 px-5 py-3 border-b border-warm-200/60 flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-2xl bg-gradient-to-br from-peach-400 to-peach-500 flex items-center justify-center text-white font-bold text-sm shadow-sm shadow-peach-500/30">
+                <i class="fa-solid fa-shirt"></i>
+            </div>
+            <div>
+                <h1 class="text-sm font-bold text-warm-900 leading-tight">ClimaFit AI</h1>
+                <p class="text-[10px] text-warm-700 font-medium flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-sage-500 animate-pulse"></span> 快適な服装を提案
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="refreshData()" class="p-2 rounded-full text-warm-700 hover:text-warm-900 hover:bg-warm-100 transition active:scale-95">
+                <i class="fa-solid fa-rotate text-xs" id="refresh-icon"></i>
+            </button>
+            <div class="text-[11px] bg-warm-100 text-warm-800 font-bold px-2.5 py-1 rounded-full border border-warm-200">
+                <i class="fa-solid fa-wifi text-sage-500 text-[10px] mr-1"></i>デモデータ
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="main-content" class="flex-1 overflow-y-auto no-scrollbar pb-24 px-4 pt-3 space-y-3.5">
+        
+        <!-- Tab 1: Dashboard -->
+        <div id="tab-dashboard" class="tab-page space-y-3.5">
+            
+            <!-- 【最上部に移動】行き先選択カード (Location Selector at the Top) -->
+            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-warm-200/80 space-y-2">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-warm-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-location-dot text-peach-500"></i> 行き先を選択
+                    </label>
+                    <span class="text-[10px] text-warm-700 bg-warm-100 px-2 py-0.5 rounded-full">サンプル室温</span>
+                </div>
+                <div class="relative">
+                    <select id="location-select" onchange="updateLocationData()" class="w-full bg-warm-50 border border-warm-200 text-warm-900 text-xs rounded-xl focus:ring-peach-400 focus:border-peach-400 p-2.5 font-bold appearance-none pr-8">
+                        <option value="情報講義室A">情報講義室A (北校舎)</option>
+                        <option value="図書館 2F">図書館 2F (中央館)</option>
+                        <option value="学生食堂">学生食堂 (カフェテリア)</option>
+                        <option value="実験室3">実験室3 (南校舎)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-warm-700">
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Climate Cards Grid (Indoor & Outdoor) -->
+            <div class="grid grid-cols-2 gap-3">
+                <!-- Indoor Sensor Data -->
+                <div class="bg-gradient-to-br from-warm-100 to-warm-200/70 rounded-2xl p-3.5 text-warm-900 shadow-sm border border-warm-200 relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[11px] font-bold text-warm-800 flex items-center gap-1">
+                            <i class="fa-solid fa-microchip text-peach-500"></i> 指定場所の室温
+                        </span>
+                    </div>
+                    <div class="flex items-baseline space-x-1 my-1">
+                        <span class="text-3xl font-extrabold text-warm-900 tracking-tight" id="indoor-temp">24.2</span>
+                        <span class="text-xs font-bold text-warm-700">°C</span>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-warm-800 pt-2 border-t border-warm-300/60">
+                        <span>湿度: <strong id="indoor-humidity">62%</strong></span>
+                        <span class="px-2 py-0.5 rounded-full bg-sage-100 text-sage-600 font-bold text-[10px]" id="discomfort-badge">快適 (71)</span>
+                    </div>
+                </div>
+
+                <!-- Outdoor Weather Data -->
+                <div class="bg-gradient-to-br from-peach-50 to-orange-50/80 rounded-2xl p-3.5 text-warm-900 shadow-sm border border-peach-100 relative overflow-hidden">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="text-[11px] font-bold text-peach-600 flex items-center gap-1">
+                            <i class="fa-solid fa-cloud-sun text-peach-500"></i> 外気予報
+                        </span>
+                        <span class="text-[9px] text-warm-700">外気サンプル</span>
+                    </div>
+                    <div class="flex items-baseline space-x-1 my-1">
+                        <span class="text-3xl font-extrabold text-warm-900 tracking-tight">18.5</span>
+                        <span class="text-xs font-bold text-warm-700">°C</span>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-warm-800 pt-2 border-t border-peach-200/60">
+                        <span>天気は未接続</span>
+                        <span class="text-peach-600 font-bold">— / —</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Discomfort Index Detail Bar -->
+            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-warm-200/80 space-y-1.5">
+                <div class="flex justify-between text-xs font-bold">
+                    <span class="text-warm-700">快適さ指標（不快指数）</span>
+                    <span class="text-peach-600 font-extrabold" id="discomfort-val">71.4 (快適)</span>
+                </div>
+                <div class="w-full bg-warm-100 h-2.5 rounded-full overflow-hidden flex">
+                    <div class="bg-blue-300 h-full" style="width: 30%"></div>
+                    <div class="bg-sage-500 h-full" style="width: 40%"></div>
+                    <div class="bg-amber-300 h-full" style="width: 20%"></div>
+                    <div class="bg-peach-400 h-full" style="width: 10%"></div>
+                </div>
+                <p class="text-[11px] text-warm-700 flex items-center gap-1 pt-0.5">
+                    <i class="fa-solid fa-face-smile text-sage-500"></i>
+                    <span id="discomfort-desc">ほとんどの人が快適に過ごせる温湿度です。</span>
+                </p>
+            </div>
+
+            <!-- Clothing Layer Recommendation Card -->
+            <div class="bg-gradient-to-br from-warm-100 via-white to-peach-50/40 rounded-3xl p-4 text-warm-900 shadow-sm border border-warm-200 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="bg-peach-500 text-white text-[11px] font-extrabold px-3 py-1 rounded-full shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> 温度に合わせた服装提案
+                    </span>
+                    <span class="text-[11px] text-warm-700 font-medium"><span id="recommend-context"></span></span>
+                </div>
+
+                <div>
+                    <h2 id="recommend-title" class="text-sm font-bold text-warm-900"></h2>
+                    <p class="text-xs text-warm-700 mt-1 leading-relaxed">
+                        <span id="recommend-description"></span>
+                    </p>
+                </div>
+
+                <div id="layer-guide" class="space-y-2"></div>
+                <button onclick="saveSuggestion()" class="w-full rounded-xl bg-warm-900 text-white py-3 text-xs font-bold">この服装提案を記録する</button>
+
+            </div>
+
+            </div>
+
+        <!-- Tab 2: コーデ相談AI -->
+        <div id="tab-review" class="tab-page hidden space-y-3.5">
+            
+            <div class="bg-white rounded-3xl p-4 shadow-sm border border-warm-200/80">
+                <div class="text-center max-w-xs mx-auto mb-3">
+                    <div class="w-10 h-10 bg-peach-100 text-peach-600 rounded-2xl flex items-center justify-center mx-auto mb-1.5 text-lg font-bold">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h2 class="text-sm font-bold text-warm-900">今日のコーデ AI判定</h2>
+                    <p class="text-[11px] text-warm-700 mt-0.5">写真を選んで服装を相談できます。現在はバックエンド未接続のため、診断結果は表示しません。</p>
+                </div>
+
+                <!-- Camera Input -->
+                <div class="relative border-2 border-dashed border-warm-200 hover:border-peach-400 rounded-2xl p-4 text-center transition bg-warm-50/50" id="drop-area">
+                    <input type="file" accept="image/*" id="camera-input" onchange="handleImageSelect(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                    
+                    <div id="upload-placeholder" class="space-y-1.5 py-3">
+                        <div class="w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center text-warm-700 mx-auto text-lg">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-warm-800">タップして撮影 または 画像を選択</p>
+                            <p class="text-[10px] text-warm-700 mt-0.5">画像を選択してプレビュー</p>
+                        </div>
+                    </div>
+
+                    <div id="image-preview-container" class="hidden relative">
+                        <img id="image-preview" src="" alt="Outfit Preview" class="w-full h-56 object-cover rounded-xl shadow-inner">
+                        <button onclick="resetImageSelect(event)" class="absolute top-2 right-2 bg-warm-900/80 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs z-20">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button id="analyze-btn" onclick="runAIAnalysis()" disabled class="w-full mt-3 bg-peach-500 disabled:bg-warm-200 text-white font-bold text-xs py-3 rounded-xl shadow-sm transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-brain"></i>
+                    <span>AIでコーデを診断・評価する</span>
+                </button>
+            </div>
+
+            <div id="ai-loading" class="hidden bg-white rounded-2xl p-5 shadow-sm border border-warm-200 text-center space-y-2">
+                <div class="inline-block animate-spin rounded-full h-7 w-7 border-3 border-peach-500 border-t-transparent"></div>
+                <div>
+                    <h4 class="text-xs font-bold text-warm-900">写真を送信中...</h4>
+                    <p class="text-[10px] text-warm-700">指定場所の室温・外気環境と照合しています</p>
+                </div>
+            </div>
+
+            <div role="status" class="text-xs text-warm-700 p-3">AI診断はバックエンド接続後に利用できます。</div>
+            <div id="ai-result-card" class="hidden bg-white rounded-3xl p-4 shadow-sm border border-peach-200 space-y-3">
+                <div class="flex items-center justify-between pb-2.5 border-b border-warm-100">
+                    <div class="flex items-center space-x-2">
+                        <span id="verdict-badge" class="px-2.5 py-1 rounded-full font-extrabold text-xs flex items-center gap-1 bg-sage-100 text-sage-600">
+                            <i class="fa-solid fa-circle-check"></i> GOOD (良し)
+                        </span>
+                        <span class="text-xs font-bold text-warm-700">スコア: <strong id="score-val" class="text-warm-900 text-sm">88</strong> / 100</span>
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <h4 class="text-xs font-bold text-warm-800 flex items-center gap-1">
+                        <i class="fa-solid fa-comment-dots text-peach-500"></i> AIからのアドバイス
+                    </h4>
+                    <p id="ai-comment-text" class="text-xs text-warm-800 leading-relaxed bg-warm-50 p-3 rounded-xl border border-warm-100">
+                        --
+                    </p>
+                </div>
+
+                <button onclick="saveOutfitLog()" class="w-full bg-warm-900 text-white font-bold text-xs py-2.5 rounded-xl hover:bg-warm-800 transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-bookmark"></i> この評価を記録に残す
+                </button>
+            </div>
+
+        </div>
+
+        <!-- 記録一覧 -->
+        <div id="tab-logs" class="tab-page hidden space-y-3">
+            <div class="flex justify-between items-center px-1">
+                <h2 class="text-xs font-bold text-warm-900 flex items-center gap-1.5">
+                    <i class="fa-solid fa-clock-rotate-left text-peach-500"></i> コーデ記録
+                </h2>
+                <span class="text-xs text-warm-700 font-medium"><span id="log-count">0</span> 件</span>
+            </div>
+
+            <div class="bg-white border border-warm-200 rounded-2xl p-3 space-y-2"><label for="logs-temp" class="block text-xs font-bold">温度条件で絞り込む</label><div class="flex gap-2"><select id="logs-mode" aria-label="温度条件の種類" class="bg-warm-50 rounded-xl p-2 text-xs border border-warm-200" onchange="renderOutfitLogs()"><option value="all">すべて</option><option value="current">現在の室温</option><option value="custom">指定した温度</option></select><input id="logs-temp" aria-label="絞り込む温度（℃）" type="number" min="-50" max="60" step="0.1" value="22" disabled class="min-w-0 w-20 border border-warm-200 rounded-xl p-2 text-xs" oninput="renderOutfitLogs()"><span class="self-center text-xs">℃</span></div><p id="logs-summary" class="text-xs text-warm-700" aria-live="polite"></p></div><div id="logs-container" class="space-y-2.5"></div>
+        </div>
+
+        <!-- Tab 4: 口コミ -->
+        <div id="tab-reviews" class="tab-page hidden space-y-3.5">
+            <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-warm-200/80 space-y-2.5">
+                <h3 class="text-xs font-bold text-warm-900 flex items-center gap-1.5">
+                    <i class="fa-solid fa-pen-to-square text-peach-500"></i> 「教室の寒さ/暑さ」を投稿
+                </h3>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[10px] text-warm-700 font-semibold block mb-1">場所</label>
+                        <select id="review-location" class="w-full bg-warm-50 border border-warm-200 text-warm-900 text-xs rounded-xl p-2 font-medium">
+                            <option value="情報講義室A">情報講義室A</option>
+                            <option value="図書館 2F">図書館 2F</option>
+                            <option value="学生食堂">学生食堂</option>
+                            <option value="実験室3">実験室3</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-warm-700 font-semibold block mb-1">体感</label>
+                        <select id="review-feel" class="w-full bg-warm-50 border border-warm-200 text-warm-900 text-xs rounded-xl p-2 font-medium">
+                            <option value="快適">ちょうど良い (快適)</option>
+                            <option value="少し寒い">少し寒い (羽織必要)</option>
+                            <option value="かなり寒い">かなり寒い (寒すぎ)</option>
+                            <option value="少し暑い">少し暑い (上着不要)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] text-warm-700 font-semibold block mb-1">コメント</label>
+                    <input type="text" id="review-comment" maxlength="500" placeholder="例: 窓際は風が冷たいです" class="w-full bg-warm-50 border border-warm-200 text-xs rounded-xl p-2 text-warm-900 focus:outline-none focus:ring-1 focus:ring-peach-400">
+                </div>
+
+                <button onclick="postReview()" class="w-full bg-peach-500 hover:bg-peach-600 text-white font-bold text-xs py-2 rounded-xl transition shadow-sm">
+                    口コミを投稿する
+                </button>
+            </div>
+
+            <div class="space-y-2">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-xs font-bold text-warm-800">みんなのリアルタイム口コミ</span>
+                </div>
+
+                <div id="reviews-list" class="space-y-2"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="glass-panel absolute bottom-0 inset-x-0 z-30 border-t border-warm-200/80 px-2 py-2">
+        <div class="grid grid-cols-4 gap-1">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center justify-center py-1 text-peach-600 font-bold transition">
+                <i class="fa-solid fa-house-chimney text-base mb-0.5"></i>
+                <span class="text-[9px]">提案</span>
+            </button>
+
+
+
+            <button onclick="switchTab('review')" id="nav-review" class="nav-btn flex flex-col items-center justify-center py-1 text-warm-700 hover:text-warm-900 font-medium transition">
+                <i class="fa-solid fa-wand-magic-sparkles text-base mb-0.5"></i>
+                <span class="text-[9px]">コーデAI</span>
+            </button>
+            <button onclick="switchTab('logs')" id="nav-logs" class="nav-btn flex flex-col items-center justify-center py-1 text-warm-700 hover:text-warm-900 font-medium transition">
+                <i class="fa-solid fa-square-poll-vertical text-base mb-0.5"></i>
+                <span class="text-[9px]">記録</span>
+            </button>
+
+            <button onclick="switchTab('reviews')" id="nav-reviews" class="nav-btn flex flex-col items-center justify-center py-1 text-warm-700 hover:text-warm-900 font-medium transition">
+                <i class="fa-solid fa-comments text-base mb-0.5"></i>
+                <span class="text-[9px]">口コミ</span>
+            </button>
+
+
+        </div>
+    </nav>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "climafit-frontend",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.cjs -i tests/tailwind-input.css -o app/src/main/assets/styles.css --content 'app/src/main/assets/*.{html,js}' --minify",
+    "test": "playwright test"
+  },
+  "devDependencies": { "@playwright/test": "1.56.1", "tailwindcss": "3.4.17" }
+}
