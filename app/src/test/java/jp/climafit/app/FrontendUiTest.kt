@@ -120,6 +120,10 @@ class FrontendUiTest {
         val right = compose.onNodeWithTag("tab-COMMUNITY").fetchSemanticsNode().boundsInRoot
         assertTrue(left.center.x < center.center.x && center.center.x < right.center.x)
         compose.onNodeWithTag("home-recommendation").assertExists()
+        compose.onNodeWithText("今日の服装の目安").assertExists()
+        compose.onNodeWithText("Tシャツ").assertExists()
+        compose.onNodeWithText("薄手のズボン").assertExists()
+        compose.onNodeWithText("薄手のカーディガン").assertExists()
         revealHomeAction("home-photo")
         val photo = compose.onNodeWithTag("home-photo").fetchSemanticsNode().boundsInRoot
         val suggestion = compose.onNodeWithTag("home-suggestion").fetchSemanticsNode().boundsInRoot

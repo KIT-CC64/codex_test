@@ -38,7 +38,15 @@ data class AiRequestUi(
     val outdoorTemperature: Double,
 )
 const val TODAY_OUTFIT_PROMPT = "今日の服装を提案して"
+/** Fixed copy for the clothing guide preview; no temperature-based recommendation logic. */
+data class ClothingGuideUi(val top: String, val bottom: String, val layer: String, val note: String)
 object PreviewData {
+    val clothingGuides = mapOf(
+        "図書館" to ClothingGuideUi("Tシャツ", "薄手のズボン", "薄手のカーディガン", "図書館では羽織りを一枚。脱ぎ着しやすい服で、心地よく。"),
+        "201教室" to ClothingGuideUi("Tシャツ", "薄手のズボン", "薄手のカーディガン", "教室では軽やかに。移動するときのために、羽織りを持って。"),
+        "学生食堂" to ClothingGuideUi("Tシャツ", "薄手のズボン", "持ち歩けるカーディガン", "食堂では涼しく、屋外では一枚プラス。調整しやすい服装に。"),
+        "実験室3" to ClothingGuideUi("長袖トップス", "薄手のズボン", "カーディガン", "ひんやりする部屋では、長袖と羽織りで調整を。"),
+    )
     const val outdoorTemperature = 18.5
     val rooms = listOf(
         RoomUi("図書館", 21.0, 48, "66.4 · 快適", "羽織りを一枚、\n心地よく。", "長袖シャツに、軽いカーディガンを。屋外と室内の行き来も、脱ぎ着で調整できます。", listOf("カーディガン", "コットンシャツ", "ストレートパンツ"), R.drawable.outfit_warm),
