@@ -236,4 +236,22 @@ class FrontendUiTest {
         compose.onNode(hasSetTextAction()).performClick().performTextInput(japanese)
         compose.onNode(hasSetTextAction()).assertTextContains(japanese)
     }
+    @Test fun registrationValidatesInputAndDiscardsItAfterClosing() {
+        showApp()
+        compose.onNodeWithTag("open-registration").performClick()
+        compose.onNodeWithTag("registration-submit").assertIsNotEnabled()
+        compose.onNodeWithTag("registration-name").performTextInput("金沢 太郎")
+        compose.onNodeWithTag("registration-email").performTextInput("sample@example.com")
+        compose.onNodeWithTag("registration-password").performTextInput("sample-password")
+        compose.onNodeWithTag("registration-confirmation").performTextInput("different")
+        compose.onNodeWithText("パスワードが一致しません").assertExists()
+        compose.onNodeWithTag("registration-submit").assertIsNotEnabled()
+        compose.onNodeWithTag("registration-confirmation").performTextReplacement("sample-password")
+        compose.onNodeWithTag("registration-submit").assertIsEnabled().performScrollTo().performClick()
+        compose.onNodeWithTag("registration-sheet").assertDoesNotExist()
+        compose.onNodeWithTag("open-registration").performClick()
+        compose.onNodeWithText("金沢 太郎").assertDoesNotExist()
+        compose.onNodeWithTag("registration-submit").assertIsNotEnabled()
+    }
+
 }

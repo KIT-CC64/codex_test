@@ -48,6 +48,7 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
     var aiMode by rememberSaveable { mutableStateOf<AiMode?>(null) }
     var roomPicker by rememberSaveable { mutableStateOf<RoomPicker?>(null) }
     var communityLocation by rememberSaveable { mutableStateOf<String?>(null) }
+    var showRegistration by remember { mutableStateOf(false) }
     val snackbar = remember { SnackbarHostState() }
     val screens = rememberSaveableStateHolder()
     val notice = model.notice
@@ -86,6 +87,9 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
             IconButton(onClick = { model.message("表示確認用のサンプルデータです。") }) {
                 Icon(painterResource(R.drawable.ic_refresh), contentDescription = "表示データについて", tint = Orange)
             }
+            IconButton(onClick = { showRegistration = true }, modifier = Modifier.testTag("open-registration")) {
+                Icon(painterResource(R.drawable.ic_settings), contentDescription = "設定・ユーザー登録", tint = Orange)
+            }
         }) },
         bottomBar = {
             NavigationBar(containerColor = Color.White) {
@@ -122,6 +126,12 @@ internal fun LayeRoomApp(model: LayeRoomViewModel = viewModel()) {
                 }
             }
         }
+    }
+    if (showRegistration) {
+        RegistrationSheet(onDismiss = { showRegistration = false }, onSubmitPreview = {
+            showRegistration = false
+            model.message("ユーザー登録画面のプレビューです。入力内容は送信・保存されず、アカウントは作成されません。")
+        })
     }
     val pickerTarget = roomPicker
     if (pickerTarget != null) {
