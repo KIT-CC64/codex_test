@@ -33,6 +33,9 @@ data class AiRequestUi(
     val mode: AiMode,
     val prompt: String? = null,
     val photo: android.graphics.Bitmap? = null,
+    val location: String,
+    val indoorTemperature: Double,
+    val outdoorTemperature: Double,
 )
 const val TODAY_OUTFIT_PROMPT = "今日の服装を提案して"
 object PreviewData {

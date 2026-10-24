@@ -27,67 +27,6 @@ import java.util.Locale
 import kotlin.math.abs
 
 @Composable
-internal fun Dashboard(model: LayeRoomViewModel, onConsult: () -> Unit) {
-    val room = model.room
-    val palette = temperaturePalette(room.temperature)
-    LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        item {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Icon(painterResource(R.drawable.ic_pin), contentDescription = null, tint = Orange)
-                Box(Modifier.weight(1f)) { Selector("今日の行き先", room.name, model.rooms.map { it.name }, model::selectRoom) }
-            }
-        }
-        item {
-            Surface(shape = RoundedCornerShape(28.dp), color = palette.background) {
-                Column(Modifier.fillMaxWidth().background(Brush.linearGradient(listOf(palette.background, if (room.temperature < 22.0) Color(0xFFF0F8FD) else Color(0xFFFFF2E8)))).padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Badge("TODAY’S OUTFIT · 今日のおすすめ", palette)
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Column(Modifier.weight(1f).align(Alignment.CenterVertically), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Text(room.recommendationTitle, fontSize = 23.sp, lineHeight = 32.sp, fontWeight = FontWeight.ExtraBold, color = Ink)
-                            Text("${room.name}に行くあなたへ", style = MaterialTheme.typography.labelMedium, color = palette.foreground)
-                        }
-                        Image(painterResource(room.photo), contentDescription = "おすすめコーデの生成サンプル写真",
-                            modifier = Modifier.width(108.dp).height(156.dp).clip(RoundedCornerShape(18.dp)), contentScale = ContentScale.Crop)
-                    }
-                    Text(room.recommendationDescription, style = MaterialTheme.typography.bodyMedium, lineHeight = 22.sp, color = Ink)
-                    Text(room.layers.joinToString(" ＋ "), style = MaterialTheme.typography.labelLarge, color = palette.foreground, fontWeight = FontWeight.SemiBold)
-                    Button(onClick = onConsult, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = palette.foreground),
-                        contentPadding = PaddingValues(14.dp)) {
-                        Icon(painterResource(R.drawable.ic_chat), contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp)); Text("写真診断・AI提案を使う", fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-        }
-        item {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                TemperatureTile("${room.name}の室温", room.temperature, "湿度 ${room.humidity}%", Modifier.weight(1f))
-                TemperatureTile("金沢の気温", model.outdoorTemperature, "屋外の気温", Modifier.weight(1f))
-            }
-        }
-        item {
-            UiCard(color = GreenSoft, border = Color(0xFFA6C8B2)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text("今の室内の快適さ", fontWeight = FontWeight.SemiBold, color = Green)
-                    Text(room.discomfort, style = MaterialTheme.typography.labelLarge, color = Green)
-                }
-                Text("温度・提案は表示確認用のサンプルです。体感に合わせて調節しましょう。", style = MaterialTheme.typography.bodySmall, color = Green)
-            }
-        }
-    }
-}
-@Composable
-private fun TemperatureTile(title: String, temperature: Double, detail: String, modifier: Modifier) {
-    val palette = temperaturePalette(temperature)
-    UiCard(modifier, color = palette.background, border = palette.border) {
-        Text(title, style = MaterialTheme.typography.labelLarge, color = palette.foreground, fontWeight = FontWeight.Bold)
-        Text("${formatTemp(temperature)}℃", fontSize = 30.sp, fontWeight = FontWeight.ExtraBold, color = palette.foreground)
-        Text(detail, style = MaterialTheme.typography.labelSmall, color = palette.foreground)
-    }
-}
-@Composable
 internal fun OutfitsScreen(model: LayeRoomViewModel) {
     var mode by rememberSaveable { mutableStateOf(TemperatureMode.ALL) }
     var custom by rememberSaveable { mutableStateOf("18") }

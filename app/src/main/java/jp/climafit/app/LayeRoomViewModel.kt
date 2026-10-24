@@ -26,18 +26,17 @@ class LayeRoomViewModel(application: Application) : AndroidViewModel(application
     var notice by mutableStateOf<String?>(null); private set
     var photo by mutableStateOf<Bitmap?>(null); private set
     var loadingPhoto by mutableStateOf(false); private set
+    var photoError by mutableStateOf<String?>(null); private set
     var latestAiRequest by mutableStateOf<AiRequestUi?>(null); private set
-    var photoResultVisible by mutableStateOf(false); private set
-    var suggestionResultVisible by mutableStateOf(false); private set
     fun requestPhotoPreview() {
         val selectedPhoto = photo ?: return
         if (loadingPhoto) return
-        latestAiRequest = AiRequestUi(AiMode.PHOTO, photo = selectedPhoto)
-        photoResultVisible = true
+        latestAiRequest = AiRequestUi(AiMode.PHOTO, photo = selectedPhoto, location = roomName,
+            indoorTemperature = room.temperature, outdoorTemperature = outdoorTemperature)
     }
     fun requestSuggestionPreview() {
-        latestAiRequest = AiRequestUi(AiMode.SUGGEST, prompt = TODAY_OUTFIT_PROMPT)
-        suggestionResultVisible = true
+        latestAiRequest = AiRequestUi(AiMode.SUGGEST, prompt = TODAY_OUTFIT_PROMPT, location = roomName,
+            indoorTemperature = room.temperature, outdoorTemperature = outdoorTemperature)
     }
     fun useCameraPreview(bitmap: Bitmap) { clearPhoto(); photo = bitmap }
     private var photoJob: Job? = null
@@ -45,7 +44,11 @@ class LayeRoomViewModel(application: Application) : AndroidViewModel(application
     fun message(text: String) { notice = text }
     fun dismissNotice() { notice = null }
     fun selectRoom(name: String) { if (rooms.any { it.name == name }) roomName = name }
-    fun clearPhoto() { photoVersion++; photoJob?.cancel(); photo = null; loadingPhoto = false; photoResultVisible = false }
+    fun clearPhoto() {
+        photoVersion++; photoJob?.cancel(); photo = null; loadingPhoto = false
+        photoError = null
+        if (latestAiRequest?.mode == AiMode.PHOTO) latestAiRequest = null
+    }
     fun loadPhoto(uri: Uri) {
         clearPhoto(); loadingPhoto = true
         val version = photoVersion
@@ -73,9 +76,19 @@ class LayeRoomViewModel(application: Application) : AndroidViewModel(application
                     while (maxOf(bounds.outWidth, bounds.outHeight) / options.inSampleSize > 1400) options.inSampleSize *= 2
                     BitmapFactory.decodeByteArray(data, 0, data.size, options) ?: error("Unsupported image")
                 }
-                if (version == photoVersion) photo = bitmap
+                if (version == photoVersion) {
+                    photo = bitmap
+                    loadingPhoto = false
+                    requestPhotoPreview()
+                }
             } catch (cancelled: kotlinx.coroutines.CancellationException) { throw cancelled }
-            catch (_: Exception) { message("画像を表示できませんでした。10MB以下のJPEG・PNG等を選んでください。") }
+            catch (_: Exception) {
+                if (version == photoVersion) {
+                    val error = "写真を読み込めませんでした。10MB以下のJPEG・PNG等を選んでください。"
+                    photoError = error
+                    message(error)
+                }
+            }
             finally { if (version == photoVersion) loadingPhoto = false }
         }
     }
