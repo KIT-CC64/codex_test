@@ -1,53 +1,42 @@
-# ClimaFit Android フロントエンド
+# ClimaFit — Kotlin / Jetpack Compose の画面モック
 
-添付HTMLを元にした Android Studio プロジェクトです。Java の Activity 内で、同梱HTML/CSS/JavaScriptを WebView に表示します。Kotlin/Compose 版ではありません。画面は通信なしで表示できます。
+**フロントエンドの表面だけ**を作成したAndroid Studioプロジェクトです。Kotlin / Jetpack Composeで実装し、HTML・JavaScript・WebViewは使用しません。
 
-## Windows の Android Studio で開く
+API通信・AI診断・服装の判定ロジック・不快指数の計算・データベース・端末内のデータ保存は実装していません。これらはバックエンド担当者の実装に委ねます。
 
-1. ZIP を展開します。
-2. Android Studio の **File → Open** で、`settings.gradle.kts` のある `codex_test` フォルダーを選びます。`Documents` 全体や `app` 単体を開かないでください。
-3. Gradle Sync の完了を待ちます。初回はネット接続が必要です。
-4. JDK エラーが出たら **Use Embedded JDK** を選びます。または Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK を Android Studio の Embedded JDK / jbr（JDK 17以上）にします。
-5. SDK Manager で Android SDK Platform 35 をインストールします。Android Studio は Android Gradle Plugin 8.9 に対応する Meerkat 以降を使ってください。
-6. Device Manager で API 26 以上のエミュレーターを作成して起動するか、USB デバッグを有効にした実機を接続します。
-7. 上部で `app` と端末を選択し、▶ Run を押します。
+## Android Studioで開く・更新する
 
-Gradle 8.11.1 / Android Gradle Plugin 8.9.2 / compile・target SDK 35 / min SDK 26。SDK の場所は Android Studio が作る `local.properties` に設定され、Git 管理しません。
+1. `settings.gradle.kts` がある **`codex_test` フォルダー**を開きます。親の `kz_2603` や `Documents` を開く必要はありません。
+2. 既にクローン済みなら **Git → Pull** で `main` の更新を取得します。再クローンは不要です。
+3. **File → Sync Project with Gradle Files** を実行します。
+4. 上部で `app` と端末を選択し、▶ Run を押します。
 
-## 実装した機能
+初回の同期にはネット接続が必要です。JDKエラー時は Settings → Build, Execution, Deployment → Build Tools → Gradle → Gradle JDK を Embedded JDK / jbr（JDK 17以上）に設定します。SDK Managerで Android SDK Platform 35 をインストールしてください。
 
-- 提案・コーデAI・記録・口コミの4タブ。ユーザーの指定に合わせ「服整理（服管理）」タブと服の登録画面を削除。
-- コーデAIは残し、画像選択・プレビュー・解除を実装。Androidの画像選択ダイアログに対応。診断APIは未接続のため、診断結果は表示しません。
-- 場所に応じた室温・湿度・不快指数・服装提案の更新。
-- 記録は「すべて / 現在の室温 / 指定した温度」で絞り込み。記録時の室温 ±2℃を対象にします。
-- 口コミの登録と服装提案の記録。端末内 localStorage に保存し、再起動後も保持。共有・サーバー送信は未実装。
-- センサー・天気・AI・サーバーには未接続。服装提案は温度の条件分岐です。
+対応：Android Studio Meerkat以降（Otter 3 対応）、Android API 26以上。Gradle 8.11.1 / Android Gradle Plugin 8.9.2 / Kotlin 2.1.20 / Compose BOM 2025.03.01。
 
-## バックエンド連携
+## 画面の範囲
 
-[docs/backend-contract.md](docs/backend-contract.md) を参照してください。現状は外部リクエストをブロックしたオフライン版です。バックエンド接続時には通信処理・Android権限・接続先の許可を別途実装します。
+- **提案**：場所の選択、室温・湿度・外気温・不快指数・服装提案のサンプル表示。提案内容・指数は固定サンプルで、計算や判定は行いません。
+- **コーデAI**：写真の選択・プレビュー・解除。画像は表示のためだけに読み込み、保存・アップロード・診断はしません。
+- **記録**：サンプル記録の一覧。「すべて / 現在の室温 / 指定した温度」による画面上の絞り込み。指定温度±2℃に当たるサンプルを表示します。
+- **口コミ**：場所・体感・コメントの入力フォームと固定サンプル一覧。
 
-## フロントエンドをブラウザーで確認
+「服整理（服管理）」タブと登録フォームは削除済みです。記録・診断・投稿ボタンは、未実装の処理であることを案内するだけです。入力内容や選択した写真はアプリ終了後には保持しません。旧WebView版のデータは読み込みません。
 
-Python 3 がある場合、プロジェクトルートで次を実行しブラウザーから確認できます。
+## 編集箇所
 
-```sh
-python -m http.server 8765 --directory app/src/main/assets
-```
+- `app/src/main/java/jp/climafit/app/MainActivity.kt`：4タブ、Compose画面、フォーム、温度による表示切り替え。
+- `app/src/main/java/jp/climafit/app/UiModels.kt`：表示用データの形と固定サンプル。
+- `app/src/main/java/jp/climafit/app/ClimaFitViewModel.kt`：画面上の選択状態、メッセージ、写真プレビュー。通信・判定・保存機能はありません。
+- `docs/ui-handoff.md`：バックエンド担当者への画面の引き継ぎメモ。API仕様は決めていません。
 
-自動テストとCSS再生成には Node.js 18 以上、Python 3 が必要です。Androidアプリの実行にNode.jsは不要です。
+## ビルド
 
-```sh
-npm ci
-npx playwright install chromium
-npm test
-npm run build:css
-```
+Windows：`gradlew.bat assembleDebug`
 
-システム Chromium を使用する場合は `CHROMIUM_PATH` に実行ファイルを設定します。CSS は生成済みを同梱しています。Font Awesome Free 6.4.0 のCSS・フォント・ライセンスも同梱しています。
+macOS / Linux：`./gradlew assembleDebug`
 
-## このクラウドでの検証
+## 検証結果
 
-Chromium による操作テスト **4件成功**：4タブと気温に応じた表示更新、服管理画面の削除、口コミのHTMLエスケープと永続化、記録の温度フィルターと永続化、コーデAIの画像プレビュー・解除と未接続案内、外部通信なし。
-
-Android APK のビルドは未確認です。`./gradlew :app:assembleDebug` を試しましたが、この環境では Java からの Gradle 配布先の名前解決に失敗しました。Android SDK もこの環境にはありません。Android Studio の実機・エミュレーター上の表示とシステムバー・キーボード動作は手元で確認してください。
+このクラウドで `:app:assembleDebug` が成功し、デバッグAPKを生成できました。実機・エミュレーターでの画面操作は未確認です。旧HTML版のブラウザーテスト結果はKotlin版には適用していません。
